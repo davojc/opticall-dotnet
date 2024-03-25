@@ -1,0 +1,1 @@
+dotnet publish opticall.sln --configuration Release --output .\release\linux --self-contained true --runtime linux-x64
