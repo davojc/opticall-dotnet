@@ -6,11 +6,15 @@ public class LuxaforController : IObserver<Tuple<ISignalTopic, SignalType>>
 {
     private ILuxaforDevice _luxaforDevice;
     private ICommandBuilder _commandBuilder;
+    private string _name;
+    private string _group;
 
-    public LuxaforController(ILuxaforDevice luxaforDevice, ICommandBuilder commandBuilder)
+    public LuxaforController(ILuxaforDevice luxaforDevice, ICommandBuilder commandBuilder, string name, string group)
     {
         _luxaforDevice = luxaforDevice;
         _commandBuilder = commandBuilder;
+        _name = name;
+        _group = group;
     }
 
     public void OnCompleted()
@@ -23,8 +27,10 @@ public class LuxaforController : IObserver<Tuple<ISignalTopic, SignalType>>
 
     public void OnNext(Tuple<ISignalTopic, SignalType> value)
     {
-        var command = _commandBuilder.Build(value.Item1);
-
-        _luxaforDevice.Run(command);
+        if(string.Equals(value.Item1.Target, _name) || string.Equals(value.Item1.Target, _group))
+        {
+            var command = _commandBuilder.Build(value.Item1);
+            _luxaforDevice.Run(command);
+        }
     }
 }

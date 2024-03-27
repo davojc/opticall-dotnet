@@ -5,8 +5,8 @@ using Opticall.Luxafor;
 using Opticall.IO;
 using Opticall.Messaging;
 using Opticall.Messaging.Signals;
+using Microsoft.Extensions.Configuration;
 
-var networkSettings = new NetworkSettings() { BindingAddress = "192.168.0.255", Port = 7654 };
 var signalSerialiser = new JsonSignalSerialiser();
 var commandBuilder = new CommandBuilder();
 
@@ -29,18 +29,23 @@ if(result.Errors.Any())
 
 var rootArgs = result.Value;
 
-switch(rootArgs.ServerMode)
+var config = new ConfigurationBuilder().AddJsonFile(rootArgs.ConfigFile).Build();
+
+Settings? settings = config.GetRequiredSection("Settings").Get<Settings>();
+
+var serverMode = rootArgs.ServerMode ?? settings.Mode;
+
+switch(serverMode)
 {
     case Mode.Server:
 
-        
         var luxafor = LuxaforDevice.Find();
 
         luxafor.RunDirect(new byte[]{1,255,255,0,0,0,0,0});
 
-        var controller = new LuxaforController(luxafor, commandBuilder);
+        var controller = new LuxaforController(luxafor, commandBuilder, settings.Signal.Name, settings.Signal.Group);
 
-        using(var receiver = new UdpListener<ISignalTopic, SignalType>(networkSettings, signalSerialiser))
+        using(var receiver = new UdpListener<ISignalTopic, SignalType>(settings.Network, signalSerialiser))
         {
             receiver.Subscribe(controller);
 
@@ -72,7 +77,7 @@ switch(rootArgs.ServerMode)
             break;
         }
 
-        using(var sender = new UdpSender<ISignalTopic, SignalType>(networkSettings, signalSerialiser))
+        using(var sender = new UdpSender<ISignalTopic, SignalType>(settings.Network, signalSerialiser))
         {
             var signalToSend = signalSerialiser.Deserialise(sendArgs.Type, sendArgs.Signal);
 

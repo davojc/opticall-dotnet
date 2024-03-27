@@ -4,7 +4,7 @@ using Opticall.Luxafor;
 namespace Opticall.Messaging.Signals;
 
 [Signal(SignalType.Fade)]
-[CommandTemplate((byte)CommandType.Fade, (byte)Led.All, 0, 0, 0, 0, 0, 0)]
+[CommandTemplate((byte)CommandType.Fade, (byte)Luxafor.Led.All, 0, 0, 0, 0, 0, 0)]
 public record FadeSignal : ISignalTopic
 {
     [JsonPropertyName("target")]
@@ -12,21 +12,21 @@ public record FadeSignal : ISignalTopic
 
     [CommandField(1)]
     [JsonPropertyName("led")]
-    public Led Led { get; set; }
+    public Led? Led { get; set; }
 
     [CommandField(2)]
     [JsonPropertyName("red")]
-    public byte Red { get; set; }
+    public byte? Red { get; set; }
 
     [CommandField(3)]
     [JsonPropertyName("green")]
-    public byte Green { get; set; }
+    public byte? Green { get; set; }
 
     [CommandField(4)]
     [JsonPropertyName("blue")]
-    public byte Blue { get; set; }
+    public byte? Blue { get; set; }
 
     [CommandField(5)]
     [JsonPropertyName("speed")]
-    public byte Speed { get; set; }
+    public byte? Speed { get; set; }
 }

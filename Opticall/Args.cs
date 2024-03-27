@@ -12,13 +12,22 @@ namespace Opticall
 
     public class RootArgs
     {
-        [Option('m', "mode", Required = true, HelpText = "There are 3 options, Default - used to send commands, Server - used to listen for commands, Monitor - to keep track of what is being sent and received.")]
-        public Mode ServerMode { get; set; }
+        [Option('m', "mode", Required = false, HelpText = "There are 3 options, Default - used to send commands, Server - used to listen for commands, Monitor - to keep track of what is being sent and received.")]
+        public Mode? ServerMode { get; set; }
+
+        [Option('c', "config", Default = "appsettings.json", Required = false, HelpText = "The settings file to use.")]
+        public string? ConfigFile { get; set; }
+
+        [Option('b', "bind", Required = false, HelpText = "The broadcast IP.")]
+        public string? Binding { get; set; }
+
+        [Option('p', "port", Required = false, HelpText = "The broadcast IP.")]
+        public int? Port { get; set; }
     }
 
     public class ServerArgs
     {
-        [Option('t', "target", Required = false, HelpText = "This is the target that the group is.")]
+        [Option('n', "name", Required = false, HelpText = "This is the name that identifies this server.")]
         public string? Target { get; set; }
 
         [Option('g', "group", Required = false, HelpText = "This is the group that the server is a member of.")]

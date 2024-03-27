@@ -12,9 +12,9 @@ public record PatternSignal : ISignalTopic
 
     [JsonPropertyName("type")]
     [CommandField(1)]
-    public PatternType Type { get; set; }
+    public PatternType? Type { get; set; }
 
     [JsonPropertyName("repeat")]
     [CommandField(2)]
-    public byte Repeat { get; set; }
+    public byte? Repeat { get; set; }
 }
