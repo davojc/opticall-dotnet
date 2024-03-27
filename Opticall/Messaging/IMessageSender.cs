@@ -1,7 +1,6 @@
-namespace Opticall.Messaging
+namespace Opticall.Messaging;
+
+public interface IMessageSender<T, M> : IDisposable where M : Enum
 {
-    public interface IMessageSender<T> : IDisposable where T: IMessage
-    {
-        Task Send(T message);
-    }
+    Task Send(M messageType, T message);
 }

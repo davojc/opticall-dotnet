@@ -1,5 +1,5 @@
 
-namespace Opticall.Luxafor.Commands;
+namespace Opticall.Luxafor;
 
 public enum CommandType : byte
 {

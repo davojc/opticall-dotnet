@@ -1,11 +1,11 @@
 
-namespace Opticall.Luxafor.Commands;
+namespace Opticall.Luxafor;
 
 public enum Led : byte
 {
-    All = 0xff,
-    Front = 0x41,
-    Back = 0x42,
+    All = 0xff, //255
+    Front = 0x41, //65
+    Back = 0x42, //66
     One = 1,
     Two = 2,
     Three = 3,
