@@ -1,15 +1,15 @@
-using Opticall.Messaging;
+using Opticall.Luxafor;
 using Opticall.Messaging.Signals;
 
-namespace Opticall.Luxafor;
-public class LuxaforController : IObserver<Tuple<ISignalTopic, SignalType>>
+namespace Opticall.Processors;
+public class SignalProcessor : IObserver<Tuple<ISignalTopic, SignalType>>
 {
     private ILuxaforDevice _luxaforDevice;
     private ICommandBuilder _commandBuilder;
     private string _name;
     private string _group;
 
-    public LuxaforController(ILuxaforDevice luxaforDevice, ICommandBuilder commandBuilder, string name, string group)
+    public SignalProcessor(ILuxaforDevice luxaforDevice, ICommandBuilder commandBuilder, string name, string group)
     {
         _luxaforDevice = luxaforDevice;
         _commandBuilder = commandBuilder;
@@ -27,7 +27,7 @@ public class LuxaforController : IObserver<Tuple<ISignalTopic, SignalType>>
 
     public void OnNext(Tuple<ISignalTopic, SignalType> value)
     {
-        if(string.Equals(value.Item1.Target, _name) || string.Equals(value.Item1.Target, _group))
+        if (string.Equals(value.Item1.Target, _name) || string.Equals(value.Item1.Target, _group))
         {
             var command = _commandBuilder.Build(value.Item1);
             _luxaforDevice.Run(command);

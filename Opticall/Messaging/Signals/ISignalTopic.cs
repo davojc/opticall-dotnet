@@ -1,4 +1,4 @@
-namespace Opticall.Messaging;
+namespace Opticall.Messaging.Signals;
 
 [Topic("signal")]
 public interface ISignalTopic

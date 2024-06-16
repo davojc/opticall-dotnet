@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "opticall", "Opticall\opticall.csproj", "{2E37AFA1-AB10-4A07-A515-EFFC442CD04B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Opticall", "Opticall\Opticall.csproj", "{2E37AFA1-AB10-4A07-A515-EFFC442CD04B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Opticall_Tests", "Opticall_Tests\Opticall_Tests.csproj", "{DFDC9007-1720-4A54-9AFF-389E8309DA5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Opticall_Tests", "Opticall_Tests\Opticall_Tests.csproj", "{DFDC9007-1720-4A54-9AFF-389E8309DA5A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

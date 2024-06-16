@@ -3,8 +3,8 @@ using Opticall;
 using Opticall.Config;
 using Opticall.Luxafor;
 using Opticall.IO;
-using Opticall.Messaging;
 using Opticall.Messaging.Signals;
+using Opticall.Processors;
 using Microsoft.Extensions.Configuration;
 
 var signalSerialiser = new JsonSignalSerialiser();
@@ -29,7 +29,10 @@ if(result.Errors.Any())
 
 var rootArgs = result.Value;
 
-var config = new ConfigurationBuilder().AddJsonFile(rootArgs.ConfigFile).Build();
+var config = new ConfigurationBuilder()
+        .AddJsonFile(rootArgs.ConfigFile)
+        //.AddCommandLine(args)
+        .Build();
 
 Settings? settings = config.GetRequiredSection("Settings").Get<Settings>();
 
@@ -43,7 +46,7 @@ switch(serverMode)
 
         luxafor.RunDirect(new byte[]{1,255,255,0,0,0,0,0});
 
-        var controller = new LuxaforController(luxafor, commandBuilder, settings.Signal.Name, settings.Signal.Group);
+        var controller = new SignalProcessor(luxafor, commandBuilder, settings.Signal.Name, settings.Signal.Group);
 
         using(var receiver = new UdpListener<ISignalTopic, SignalType>(settings.Network, signalSerialiser))
         {

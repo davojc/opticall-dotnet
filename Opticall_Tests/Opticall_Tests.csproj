@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Opticall\opticall.csproj" />
+    <ProjectReference Include="..\Opticall\Opticall.csproj" />
   </ItemGroup>
 
 </Project>

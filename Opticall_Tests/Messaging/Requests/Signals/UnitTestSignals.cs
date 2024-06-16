@@ -1,5 +1,4 @@
 using Opticall.Luxafor;
-using Opticall.Messaging;
 using Opticall.Messaging.Signals;
 
 namespace Opticall_Tests.Messaging.Requests.Signals;
