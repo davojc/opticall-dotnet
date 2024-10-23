@@ -52,16 +52,24 @@ router.AddRoute(new StrobeCommand(), command => { luxafor.Run(command); }, $"/{t
 router.AddRoute(new WaveCommand(), command => { luxafor.Run(command); }, $"/{target}/led/wave", $"/{group}/led/wave", "/*/led/wave");
 router.AddRoute(new FadeCommand(), command => { luxafor.Run(command); }, $"/{target}/led/fade", $"/{group}/led/fade", "/*/led/fade");
 
+
 using (var receiver = new OscUdpListener(port))
 {
+    AppDomain.CurrentDomain.ProcessExit += (sender, args) => {
+        receiver.Stop();
+    };
+
+
+    Console.CancelKeyPress += (sender, args) => {
+        receiver.Stop();
+        args.Cancel = true;
+    };
+
     receiver.Subscribe(router);
 
     var task = receiver.StartListening();
     Console.WriteLine("Listening for incoming commands");
     Console.ReadLine();
-
-    // Stop the server
-    receiver.Stop();
 
     // Wait for the listening task to complete
     await task;

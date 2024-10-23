@@ -35,8 +35,15 @@ public class OscUdpListener : ICommandListener
 
     public void Stop() 
     {
-        _cancelTokenSrc.Cancel();
-        System.Console.WriteLine("Stop called");
+        try
+        {
+            _cancelTokenSrc.Cancel();
+            System.Console.WriteLine("Stop called");
+        }
+        catch(System.ObjectDisposedException)
+        {
+            _disposed = true;
+        }
     }
 
     public async Task StartListening()
