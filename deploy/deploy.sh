@@ -5,9 +5,12 @@ SERVICE_VERSION=0.2
 SERVICE_NAME="opticall"
 SERVICE_DIR="/usr/local/bin/$SERVICE_NAME"
 SERVICE_FILE="$SERVICE_DIR/$SERVICE_NAME"
+SERVICE_CONFIG_FILE="$SERVICE_DIR/appsettings.json"
 SERVICE_DESCRIPTION_FILE="/etc/systemd/system/$SERVICE_NAME.service"
-SERVICE_BINARY_URL="https://github.com/davojc/opticall-dotnet/releases/download/$SERVICE_VERSION/opticall"
-SERVICE_DESCRIPTION_URL="https://github.com/davojc/opticall-dotnet/releases/download/$SERVICE_VERSION/$SERVICE_NAME.service"
+SERVICE_DOWNLOAD_URL="https://github.com/davojc/opticall-dotnet/releases/download/$SERVICE_VERSION"
+SERVICE_BINARY_URL="$SERVICE_DOWNLOAD_URL/$SERVICE_NAME"
+SERVICE_CONFIG_URL="$SERVICE_DOWNLOAD_URL/appsettings.json"
+SERVICE_DESCRIPTION_URL="$SERVICE_DOWNLOAD_URL/$SERVICE_NAME.service"
 
 # Function to check if the service exists
 check_service_exists() {
@@ -43,7 +46,9 @@ download_service_file() {
 }
 
 # Function to download the service description file
-download_service_description() {
+download_service_description_and_settings() {
+    echo "Downloading default config file..."
+    sudo curl -L "$SERVICE_CONFIG_URL" -o "$SERVICE_CONFIG_FILE"
     echo "Downloading service description file..."
     sudo curl -L "$SERVICE_DESCRIPTION_URL" -o "$SERVICE_DESCRIPTION_FILE"
 }
@@ -77,7 +82,7 @@ else
     echo "$SERVICE_NAME is not installed. Proceeding with installation..."
     create_directory
     download_service_file
-    download_service_description
+    download_service_description_and_settings
     install_and_start_service
 fi
 
