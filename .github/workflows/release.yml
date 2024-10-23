@@ -44,12 +44,12 @@ jobs:
         run: dotnet publish ./Opticall.Console/Opticall.Console.csproj -c Release -r linux-arm64 -o ./publish/linux-arm --self-contained true
 
       # Step 5c: Publish the Apple x64 version
-      - name: Publish the Apple x64 version
-        run: dotnet publish ./Opticall.Console/Opticall.Console.csproj -c Release -r osx-x64 -o ./publish/mac --self-contained true
+      #- name: Publish the Apple x64 version
+      #  run: dotnet publish ./Opticall.Console/Opticall.Console.csproj -c Release -r osx-x64 -o ./publish/mac --self-contained true
 
       # Step 5d: Publish the Apple ARM version
-      - name: Publish the Apple ARM version
-        run: dotnet publish ./Opticall.Console/Opticall.Console.csproj -c Release -r osx-arm -o ./publish/mac-arm --self-contained true
+      #- name: Publish the Apple ARM version
+      #  run: dotnet publish ./Opticall.Console/Opticall.Console.csproj -c Release -r osx-arm -o ./publish/mac-arm --self-contained true
 
       # Step 6: Create a GitHub Release
       - name: Create GitHub Release
