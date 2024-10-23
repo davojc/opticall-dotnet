@@ -29,11 +29,11 @@ jobs:
 
       # Step 4: Publish the Windows Version
       - name: Publish the Windows version
-        run: dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r win-x64 -o ./publish/win --self-contained true
+        run: dotnet publish ./Opticall.Console/Opticall.Console.csproj -c Release -r win-x64 -o ./publish/win --self-contained true
 
       # Step 5: Publish the Linux version
       - name: Publish the Linux version
-        run: dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r linux-x64 -o ./publish/linux --self-contained true
+        run: dotnet publish ./Opticall.Console/Opticall.Console.csproj -c Release -r linux-x64 -o ./publish/linux --self-contained true
 
       # Step 6: Create a GitHub Release
       - name: Create GitHub Release
