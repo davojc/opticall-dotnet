@@ -39,6 +39,18 @@ jobs:
       - name: Publish the Linux version
         run: dotnet publish ./Opticall.Console/Opticall.Console.csproj -c Release -r linux-x64 -o ./publish/linux --self-contained true
 
+      # Step 5b: Publish the Linux ARM version
+      - name: Publish the Linux ARM version
+        run: dotnet publish ./Opticall.Console/Opticall.Console.csproj -c Release -r linux-arm64 -o ./publish/linux-arm --self-contained true
+
+      # Step 5c: Publish the Apple x64 version
+      - name: Publish the Apple x64 version
+        run: dotnet publish ./Opticall.Console/Opticall.Console.csproj -c Release -r osx-x64 -o ./publish/mac --self-contained true
+
+      # Step 5d: Publish the Apple ARM version
+      - name: Publish the Apple ARM version
+        run: dotnet publish ./Opticall.Console/Opticall.Console.csproj -c Release -r osx-arm -o ./publish/mac-arm --self-contained true
+
       # Step 6: Create a GitHub Release
       - name: Create GitHub Release
         id: create_release
@@ -71,6 +83,17 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./publish/linux/opticall               # The path to the published output
           asset_name: opticall     # Rename the uploaded file
+          asset_content_type: application/octet-stream
+
+      # Step 8: Upload the linux binary to the GitHub Release
+      - name: Upload Linux ARM binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./publish/linux-arm/opticall               # The path to the published output
+          asset_name: opticall-arm     # Rename the uploaded file
           asset_content_type: application/octet-stream
 
       # Step 9: Upload the default configuration file to the GitHub Release

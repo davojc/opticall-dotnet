@@ -2,12 +2,21 @@
 
 # Variables
 SERVICE_NAME="opticall"
+
+arch=$(uname -m)
+
+srcFile="$SERVICE_NAME"
+
+if [[ "$arch" == "aarch64" ]]; then
+    srcFile="opticall-arm"
+fi
+
 SERVICE_DIR="/usr/local/bin/$SERVICE_NAME"
 SERVICE_FILE="$SERVICE_DIR/$SERVICE_NAME"
 SERVICE_CONFIG_FILE="$SERVICE_DIR/appsettings.json"
 SERVICE_DESCRIPTION_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 SERVICE_DOWNLOAD_URL="https://github.com/davojc/opticall-dotnet/releases/latest/download"
-SERVICE_BINARY_URL="$SERVICE_DOWNLOAD_URL/$SERVICE_NAME"
+SERVICE_BINARY_URL="$SERVICE_DOWNLOAD_URL/$srcFile"
 SERVICE_CONFIG_URL="$SERVICE_DOWNLOAD_URL/appsettings.json"
 SERVICE_DESCRIPTION_URL="$SERVICE_DOWNLOAD_URL/$SERVICE_NAME.service"
 

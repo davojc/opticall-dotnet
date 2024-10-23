@@ -1,1 +1,1 @@
-dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r linux-x64 -o .\release\linux --self-contained true
+dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r linux-x64 -o .\publish\linux --self-contained true

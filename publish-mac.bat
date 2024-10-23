@@ -1,0 +1,1 @@
+dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r osx-x64 -o .\publish\mac --self-contained true
