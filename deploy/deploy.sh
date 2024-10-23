@@ -9,6 +9,8 @@ srcFile="$SERVICE_NAME"
 
 if [[ "$arch" == "aarch64" ]]; then
     srcFile="opticall-arm"
+elif [[ "$arch" == "armv7l" || "$arch" == "armv61" ]]; then
+    srcFile="opticall-arm-32"
 fi
 
 SERVICE_DIR="/usr/local/bin/$SERVICE_NAME"
@@ -48,7 +50,7 @@ create_directory() {
 
 # Function to download the service binary
 download_service_file() {
-    echo "Downloading service binary..."
+    echo "Downloading service binary from $SERVICE_BINARY_URL..."
     sudo curl -L "$SERVICE_BINARY_URL" -o "$SERVICE_FILE"
     sudo chmod +x "$SERVICE_FILE" # Make the file executable
 }
