@@ -33,7 +33,7 @@ var config = new ConfigurationBuilder()
 
 var luxafor = LuxaforDevice.Find();
 
-luxafor.RunDirect(new byte[] { 1, 255, 255, 0, 0, 0, 0, 0 });
+luxafor.RunDirect(new byte[] { 0, (byte)CommandType.Pattern, 1, 5 });
 
 var router = new CommandRouter();
 
