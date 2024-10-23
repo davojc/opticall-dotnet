@@ -1,0 +1,102 @@
+name: Build and Publish .NET Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # This workflow triggers when a tag matching the pattern 'v*' (e.g., v1.0.0) is pushed
+
+#dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r linux-x64 -o .\release\linux --self-contained true
+#dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r win-x64 -o .\release\win --self-contained true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up .NET
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'  # Adjust this to your required .NET version
+
+      # Step 3: Restore dependencies
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Step 4: Publish the Windows Version
+      - name: Publish the Windows version
+        run: dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r win-x64 -o ./publish/win --self-contained true
+
+      # Step 5: Publish the Linux version
+      - name: Publish the Linux version
+        run: dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r linux-x64 -o ./publish/linux --self-contained true
+
+      # Step 6: Create a GitHub Release
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}         # Use the pushed tag as the release tag
+          release_name: Release ${{ github.ref }}  # Set the release name based on the tag
+          draft: false
+          prerelease: false
+
+      # Step 7: Upload the windows binary to the GitHub Release
+      - name: Upload Windows binary
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./publish/win/opticall.exe               # The path to the published output
+          asset_name: opticall.exe     # Rename the uploaded file
+          asset_content_type: application/octet-stream
+
+      # Step 8: Upload the linux binary to the GitHub Release
+      - name: Upload Linux binary
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./publish/linux/opticall               # The path to the published output
+          asset_name: opticall     # Rename the uploaded file
+          asset_content_type: application/octet-stream
+
+      # Step 9: Upload the default configuration file to the GitHub Release
+      - name: Upload Configuration File
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./publish/win/appsettings.json               # The path to the published output
+          asset_name: appsettings.json     # Rename the uploaded file
+          asset_content_type: application/json
+
+      # Step 10: Upload the default configuration file to the GitHub Release
+      - name: Upload Deploy Bash Script
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./deploy/deploy.sh               # The path to the published output
+          asset_name: deploy.sh     # Rename the uploaded file
+          asset_content_type: text/x-sh
+
+      # Step 11: Upload the default configuration file to the GitHub Release
+      - name: Upload Uninstall Bash Script
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./deploy/uninstall.sh               # The path to the published output
+          asset_name: uninstall.sh     # Rename the uploaded file
+          asset_content_type: text/x-sh
+
+      # Step 11: Upload the default configuration file to the GitHub Release
+      - name: Upload Service Description file
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./deploy/opticall.service               # The path to the published output
+          asset_name: opticall.service     # Rename the uploaded file
+          asset_content_type: text/plain

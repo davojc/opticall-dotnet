@@ -77,6 +77,7 @@ if check_service_exists; then
     echo "$SERVICE_NAME is already installed."
     stop_service
     download_service_file
+    start_service
 else
     echo "$SERVICE_NAME is not installed. Proceeding with installation..."
     create_directory
