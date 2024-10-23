@@ -1,1 +1,1 @@
-dotnet publish opticall.sln --configuration Release --output .\release\win --self-contained true --runtime win-x64
+dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r win-x64 -o .\release\win --self-contained true
