@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using HidSharp;
 
 namespace Opticall.Console.Luxafor;
@@ -65,7 +66,9 @@ public class LuxaforDevice : ILuxaforDevice
 
                 var allDeviceList = list.GetAllDevices().ToArray();
 
-                HashSet<string> names = new HashSet<string>();
+                var names = new HashSet<string>();
+
+                var deviceManager = new LuxaforDeviceManager();
 
                 foreach (Device dev in allDeviceList)
                 {
@@ -83,8 +86,14 @@ public class LuxaforDevice : ILuxaforDevice
                     if (name != null && name.Equals("LUXAFOR FLAG"))
                     {
                         System.Console.WriteLine("Found device.");
-                        return new LuxaforDevice(hid);
+
+                        deviceManager.Add(new LuxaforDevice(hid));
                     }
+                }
+
+                if (deviceManager.Count > 0)
+                {
+                    return deviceManager;
                 }
 
                 System.Console.WriteLine("Still waiting for device to be plugged in...");
