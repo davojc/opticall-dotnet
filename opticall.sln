@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Opticall.Console", "Optical
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Opticall_Tests", "Opticall_Tests\Opticall_Tests.csproj", "{DFDC9007-1720-4A54-9AFF-389E8309DA5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Opticall", "Opticall\Opticall.csproj", "{3EE3C959-715B-469C-8088-8087243A7863}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
