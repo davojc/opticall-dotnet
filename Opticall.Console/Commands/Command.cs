@@ -7,11 +7,13 @@ public abstract class Command(CommandType commandType)
 {
     protected abstract int Length { get; }
 
+    protected virtual int CommandPosition => 0;
+
     public byte[] CreateCommand(OscMessage message)
     {
         var command = Enumerable.Repeat((byte)0, Length).ToArray();
 
-        command[0] = (byte)commandType;
+        command[CommandPosition] = (byte)commandType;
 
         var args = message.Arguments?.ToArray();
 

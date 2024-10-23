@@ -26,6 +26,7 @@ var rootArgs = result.Value;
 
 var config = new ConfigurationBuilder()
         .AddJsonFile(rootArgs.ConfigFile ?? "", optional: true)
+        .AddEnvironmentVariables()
         .AddCommandLine(args)
         .Build();
 
@@ -66,7 +67,7 @@ var patternCommand = new PatternCommand();
 router.AddRoute("/led/pattern", osc =>
 {
     var cmd = patternCommand.CreateCommand(osc);
-    luxafor.Run(cmd);
+    luxafor.RunDirect(cmd);
 });
 
 var strobeCommand = new StrobeCommand();
@@ -98,6 +99,8 @@ router.AddRoute("/config/target", osc =>
         return;
 
     router.ReplaceIdentifier(target, newTarget);
+
+    Environment.SetEnvironmentVariable("Target", newTarget);
 });
 
 router.AddRoute("/config/group", osc =>
@@ -108,6 +111,8 @@ router.AddRoute("/config/group", osc =>
         return;
 
     router.ReplaceIdentifier(group, newGroup);
+
+    Environment.SetEnvironmentVariable("Group", newGroup);
 });
 
 
