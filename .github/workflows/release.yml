@@ -5,11 +5,15 @@ on:
     tags:
       - 'v*'  # This workflow triggers when a tag matching the pattern 'v*' (e.g., v1.0.0) is pushed
 
+
+permissions:
+  contents: write
 #dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r linux-x64 -o .\release\linux --self-contained true
 #dotnet publish .\Opticall.Console\Opticall.Console.csproj -c Release -r win-x64 -o .\release\win --self-contained true
 
 jobs:
   build:
+    permissions: write-all
     runs-on: ubuntu-latest
 
     steps:
