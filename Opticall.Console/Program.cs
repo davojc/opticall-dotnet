@@ -31,7 +31,9 @@ var config = new ConfigurationBuilder()
         .AddCommandLine(args)
         .Build();
 
-var luxafor = LuxaforDevice.Find();
+var cancellation = new CancellationTokenSource();
+
+var luxafor = await LuxaforDevice.FindAsync(cancellation);
 
 luxafor.RunDirect(new byte[] { 0, (byte)CommandType.Pattern, 1, 5 });
 
@@ -53,7 +55,7 @@ router.AddRoute(new WaveCommand(), command => { luxafor.Run(command); }, $"/{tar
 router.AddRoute(new FadeCommand(), command => { luxafor.Run(command); }, $"/{target}/led/fade", $"/{group}/led/fade", "/*/led/fade");
 
 
-using (var receiver = new OscUdpListener(port))
+using (var receiver = new OscUdpListener(port, cancellation))
 {
     AppDomain.CurrentDomain.ProcessExit += (sender, args) => {
         receiver.Stop();

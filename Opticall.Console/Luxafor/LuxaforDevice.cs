@@ -53,38 +53,45 @@ public class LuxaforDevice : ILuxaforDevice
       
     }
 
-    public static ILuxaforDevice Find() 
+    public static Task<ILuxaforDevice> FindAsync(CancellationTokenSource cancellationTokenSource)
     {
-        var list = DeviceList.Local;
+        System.Console.WriteLine("Searching for device...");
 
-        var allDeviceList = list.GetAllDevices().ToArray();
-
-        HashSet<string> names = new HashSet<string>();
-
-        foreach (Device dev in allDeviceList)
+        return Task<ILuxaforDevice>.Factory.StartNew(() =>
         {
-            var name = dev.GetFriendlyName();
-
-            var hid = dev as HidDevice;
-
-            if(hid == null)
+            while (!cancellationTokenSource.Token.IsCancellationRequested)
             {
-                continue;    
+                var list = DeviceList.Local;
+
+                var allDeviceList = list.GetAllDevices().ToArray();
+
+                HashSet<string> names = new HashSet<string>();
+
+                foreach (Device dev in allDeviceList)
+                {
+                    var name = dev.GetFriendlyName();
+
+                    var hid = dev as HidDevice;
+
+                    if (hid == null)
+                    {
+                        continue;
+                    }
+
+                    names.Add(hid.DevicePath);
+
+                    if (name != null && name.Equals("LUXAFOR FLAG"))
+                    {
+                        System.Console.WriteLine("Found device.");
+                        return new LuxaforDevice(hid);
+                    }
+                }
+
+                System.Console.WriteLine("Still waiting for device to be plugged in...");
+                Thread.Sleep(TimeSpan.FromSeconds(30));
             }
 
-            names.Add(hid.DevicePath);
-
-            if (name != null && name.Equals("LUXAFOR FLAG"))
-            {
-                return new LuxaforDevice(hid);
-            }
-        }
-
-        System.Console.WriteLine("Vendor Id: " + Convert.ToInt64(0x04d8));
-        System.Console.WriteLine("Other Id: " + Convert.ToInt64(0xf372));
-
-        System.Console.WriteLine(string.Join("\n", names));
-
-        throw new DeviceNotFoundException();
+            return null;
+        }, cancellationTokenSource.Token);
     }
 }

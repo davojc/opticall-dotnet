@@ -15,7 +15,7 @@ public class OscUdpListener : ICommandListener
 
     private bool _disposed;
 
-    public OscUdpListener(int port)
+    public OscUdpListener(int port, CancellationTokenSource cancellation)
     {
         _subject = new Subject<OscMessage>();
 
@@ -25,7 +25,7 @@ public class OscUdpListener : ICommandListener
         udpSocket.Bind(ipEndpoint);
 
         _client = new UdpClient() { Client = udpSocket };
-        _cancelTokenSrc = new CancellationTokenSource();
+        _cancelTokenSrc = cancellation;
     }
 
     ~OscUdpListener() // the finalizer
