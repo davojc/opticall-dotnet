@@ -4,5 +4,9 @@ namespace Opticall.Console.Commands;
 
 public interface ICommandRouter : IObserver<OscMessage>
 {
-    void AddRoute(Command command, Action<byte[]> onRoute, string route, params string?[] alternates);
+    void AddIdentifier(string identifier);
+
+    void ReplaceIdentifier(string identifier, string newIdentifier);
+
+    void AddRoute(string route, Action<OscMessage> onRoute);
 }

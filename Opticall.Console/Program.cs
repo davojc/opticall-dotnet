@@ -2,10 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Opticall.Console;
 using Opticall.Console.Commands;
-using Opticall.Console.Config;
 using Opticall.Console.IO;
 using Opticall.Console.Luxafor;
-
 
 var argsParser = new Parser(settings => {
     settings.HelpWriter = Console.Error;
@@ -47,12 +45,70 @@ Console.WriteLine($"Target: {target}");
 Console.WriteLine($"Group: {group}");
 Console.WriteLine($"Port: {port}");
 
-router.AddRoute(new OnCommand(), command => { luxafor.Run(command); }, $"/{target}/led/on", $"/{group}/led/on", "/*/led/on");
-router.AddRoute(new OffCommand(), command => { luxafor.Run(command); }, $"/{target}/led/off", $"/{group}/led/off", "/*/led/off");
-router.AddRoute(new PatternCommand(), command => { luxafor.Run(command); }, $"/{target}/led/pattern", $"/{group}/led/pattern", "/*/led/pattern");
-router.AddRoute(new StrobeCommand(), command => { luxafor.Run(command); }, $"/{target}/led/strobe", $"/{group}/led/strobe", "/*/led/strobe");
-router.AddRoute(new WaveCommand(), command => { luxafor.Run(command); }, $"/{target}/led/wave", $"/{group}/led/wave", "/*/led/wave");
-router.AddRoute(new FadeCommand(), command => { luxafor.Run(command); }, $"/{target}/led/fade", $"/{group}/led/fade", "/*/led/fade");
+router.AddIdentifier(target);
+router.AddIdentifier(group);
+
+var onCommand = new OnCommand();
+router.AddRoute("/led/on", osc =>
+{
+    var cmd = onCommand.CreateCommand(osc);
+    luxafor.Run(cmd);
+});
+
+var offCommand = new OffCommand();
+router.AddRoute("/led/off", osc =>
+{
+    var cmd = offCommand.CreateCommand(osc);
+    luxafor.Run(cmd);
+});
+
+var patternCommand = new PatternCommand();
+router.AddRoute("/led/pattern", osc =>
+{
+    var cmd = patternCommand.CreateCommand(osc);
+    luxafor.Run(cmd);
+});
+
+var strobeCommand = new StrobeCommand();
+router.AddRoute("/led/strobe", osc =>
+{
+    var cmd = strobeCommand.CreateCommand(osc);
+    luxafor.Run(cmd);
+});
+
+var waveCommand = new WaveCommand();
+router.AddRoute("/led/wave", osc =>
+{
+    var cmd = waveCommand.CreateCommand(osc);
+    luxafor.Run(cmd);
+});
+
+var fadeCommand = new FadeCommand();
+router.AddRoute("/led/fade", osc =>
+{
+    var cmd = fadeCommand.CreateCommand(osc);
+    luxafor.Run(cmd);
+});
+
+router.AddRoute("/config/target", osc =>
+{
+    var newTarget = osc.ReadFirstArgAsString();
+
+    if (newTarget == null)
+        return;
+
+    router.ReplaceIdentifier(target, newTarget);
+});
+
+router.AddRoute("/config/group", osc =>
+{
+    var newGroup = osc.ReadFirstArgAsString();
+
+    if (newGroup == null)
+        return;
+
+    router.ReplaceIdentifier(group, newGroup);
+});
 
 
 using (var receiver = new OscUdpListener(port, cancellation))
