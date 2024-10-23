@@ -5,7 +5,8 @@ After=network.target
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/local/opticall/opticall
+WorkingDirectory=/usr/local/bin/opticall
+ExecStart=/usr/local/bin/opticall/opticall
 
 [Install]
 WantedBy=multi-user.target
