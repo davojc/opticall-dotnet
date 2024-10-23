@@ -54,6 +54,8 @@ jobs:
       # Step 7: Upload the windows binary to the GitHub Release
       - name: Upload Windows binary
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./publish/win/opticall.exe               # The path to the published output
@@ -63,6 +65,8 @@ jobs:
       # Step 8: Upload the linux binary to the GitHub Release
       - name: Upload Linux binary
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./publish/linux/opticall               # The path to the published output
@@ -72,6 +76,8 @@ jobs:
       # Step 9: Upload the default configuration file to the GitHub Release
       - name: Upload Configuration File
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./publish/win/appsettings.json               # The path to the published output
@@ -81,6 +87,8 @@ jobs:
       # Step 10: Upload the default configuration file to the GitHub Release
       - name: Upload Deploy Bash Script
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./deploy/deploy.sh               # The path to the published output
@@ -90,6 +98,8 @@ jobs:
       # Step 11: Upload the default configuration file to the GitHub Release
       - name: Upload Uninstall Bash Script
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./deploy/uninstall.sh               # The path to the published output
@@ -99,6 +109,8 @@ jobs:
       # Step 11: Upload the default configuration file to the GitHub Release
       - name: Upload Service Description file
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./deploy/opticall.service               # The path to the published output
