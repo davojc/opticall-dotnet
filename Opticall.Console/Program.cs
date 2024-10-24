@@ -1,9 +1,13 @@
-﻿using CommandLine;
+﻿using System.Text;
+using CommandLine;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Opticall.Console;
 using Opticall.Console.Commands;
 using Opticall.Console.IO;
 using Opticall.Console.Luxafor;
+using Opticall.Console.OSC;
+using Opticall.Console.OSC.Converters;
 
 var argsParser = new Parser(settings => {
     settings.HelpWriter = Console.Error;
@@ -32,9 +36,7 @@ var config = new ConfigurationBuilder()
 
 var cancellation = new CancellationTokenSource();
 
-var luxafor = await LuxaforDevice.FindAsync(cancellation);
-
-luxafor.RunDirect(new byte[] { 0, (byte)CommandType.Pattern, 1, 5 });
+var luxafor = new LuxaforDeviceManager();
 
 var router = new CommandRouter();
 
@@ -48,6 +50,7 @@ Console.WriteLine($"Port: {port}");
 
 router.AddIdentifier(target);
 router.AddIdentifier(group);
+router.AddIdentifier("*");
 
 var onCommand = new OnCommand();
 router.AddRoute("/led/on", osc =>
@@ -132,8 +135,34 @@ using (var receiver = new OscUdpListener(port, cancellation))
 
     var task = receiver.StartListening();
     Console.WriteLine("Listening for incoming commands");
-    Console.ReadLine();
 
+    var stringConverter = new StringConverter();
+    var intConverter = new IntConverter();
+    var msgConverter = new OscMessageConverter();
+
+    while (!cancellation.IsCancellationRequested)
+    {
+        var command = Console.ReadLine();
+
+        if (command == null)
+            continue;
+
+        var parts = command.Split(' ');
+
+        var address = new Address(parts[0]);
+        var objectArgs = new List<object>();
+
+        foreach (var arg in parts.Skip(1))
+        {
+            var intArg = Convert.ToInt32(arg);
+            objectArgs.Add(intArg);
+        }
+
+        var msg = new OscMessage(address, objectArgs);
+
+        router.OnNext(msg);
+    }
+    
     // Wait for the listening task to complete
     await task;
 }

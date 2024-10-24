@@ -109,7 +109,13 @@ public class CommandRouter : ICommandRouter
 
         if (_routes.TryGetValue(route, out var rs))
         {
-             rs.OnRoute(message);
+            try
+            {
+                rs.OnRoute(message);
+            }
+            catch (IndexOutOfRangeException)
+            {
+            }
         }
     }
 }

@@ -5,8 +5,8 @@ namespace Opticall.Console.OSC.IO
 {
     public static class NetworkExtensions
     {
-        private static readonly BytesConverter BytesConverter = new BytesConverter();
-        private static readonly OscMessageConverter MessageConverter = new OscMessageConverter();
+        public static readonly BytesConverter BytesConverter = new BytesConverter();
+        public static readonly OscMessageConverter MessageConverter = new OscMessageConverter();
 
         public static async Task SendMessageAsync(this UdpClient client, OscMessage message)
         {
