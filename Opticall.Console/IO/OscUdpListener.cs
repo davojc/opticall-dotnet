@@ -11,11 +11,11 @@ public class OscUdpListener : ICommandListener
 {
     readonly UdpClient _client;
     readonly Subject<OscMessage> _subject;
-    readonly CancellationTokenSource _cancelTokenSrc;
+    readonly CancellationToken _cancelTokenSrc;
 
     private bool _disposed;
 
-    public OscUdpListener(int port, CancellationTokenSource cancellation)
+    public OscUdpListener(int port, CancellationToken cancellation)
     {
         _subject = new Subject<OscMessage>();
 
@@ -33,26 +33,13 @@ public class OscUdpListener : ICommandListener
         Dispose(false);
     }
 
-    public void Stop() 
-    {
-        try
-        {
-            _cancelTokenSrc.Cancel();
-            System.Console.WriteLine("Stop called");
-        }
-        catch(System.ObjectDisposedException)
-        {
-            _disposed = true;
-        }
-    }
-
     public async Task StartListening()
     {
         try
         {
-            while (!_cancelTokenSrc.Token.IsCancellationRequested)
+            while (!_cancelTokenSrc.IsCancellationRequested)
             {
-                var message = await _client.ReceiveMessageAsync(_cancelTokenSrc.Token);
+                var message = await _client.ReceiveMessageAsync(_cancelTokenSrc);
                 _subject.OnNext(message);
             }
         }
@@ -90,7 +77,6 @@ public class OscUdpListener : ICommandListener
         {
             if (disposing)
             {
-                _cancelTokenSrc.Dispose();
                 _client.Close();
             }
             // Release unmanaged resources.

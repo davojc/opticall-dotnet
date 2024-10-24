@@ -4,44 +4,6 @@ using Opticall.Console.OSC;
 
 namespace Opticall.Console.Commands;
 
-
-internal class Routes
-{
-    private readonly string _identifier;
-    private readonly HashSet<string> _routes = new HashSet<string>();
-    private readonly HashSet<string> _paths = new HashSet<string>();
-
-    public Routes(string identifier)
-    {
-        _identifier = identifier;
-        ChangeIdentifier(identifier);
-    }
-
-    public void AddPath(string path)
-    {
-        _paths.Add(path);
-    }
-
-    public void ChangeIdentifier(string newIdentifier)
-    {
-        _routes.Clear();
-
-        newIdentifier = newIdentifier.TrimStart('/');
-        newIdentifier = newIdentifier.TrimEnd('/');
-
-        foreach (var path in _paths)
-        {
-            _routes.Add($"{newIdentifier}{path}");
-        }
-    }
-
-    public IEnumerable<string> GetRoutes()
-    {
-        return _routes;
-    }
-
-}
-
 public class CommandRouter : ICommandRouter
 {
     private readonly HashSet<string> _identifiers = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
