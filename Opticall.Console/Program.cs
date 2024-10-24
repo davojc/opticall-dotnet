@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using CommandLine;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Opticall.Console;
 using Opticall.Console.Commands;
 using Opticall.Console.IO;
