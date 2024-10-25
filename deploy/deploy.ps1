@@ -1,9 +1,11 @@
 # Setting env variables if provided
 param (
     [Parameter(Mandatory=$false)]
+    [Alias("t")]
     [string]$Target,
 
     [Parameter(Mandatory=$false)]
+    [Alias("g")]
     [string]$Group
 )
 
@@ -45,19 +47,20 @@ foreach ($fileUrl in $FileUrls) {
     Download-File -url $fileUrl -destinationPath $destinationPath
 }
 
-$yamlFilePath = "$destinationPath\settings.yml"
-$yamlData = Get-Content -Path $yamlFilePath -Raw
+$yamlFilePath = "$InstallPath\settings.yml"
+$yamlContent = Get-Content -Path $yamlFilePath -Raw
 
 if ($Target) {
-    $yamlContent = $yamlContent -replace '(target:\s*)(\d+)', '${1}$Target'
+    $yamlContent = $yamlContent -replace 'target:[a-zA-Z ]+', "target: $Target"
 }
 
 if ($Group) {
-    $yamlContent = $yamlContent -replace '(group:\s*)(\d+)', '${1}$Group'
+    $yamlContent = $yamlContent -replace 'group:[a-zA-Z ]+', "group: $Group"
 }
 
-# Convert back to YAML format and write it to the file
-$yamlData | ConvertTo-Yaml | Set-Content -Path $yamlFilePath
+
+# Write it to the file
+Set-Content -Path $yamlFilePath -Value $yamlContent
 
 # Register the service if it doesn't exist
 if (!(Get-Service -Name $ServiceName -ErrorAction SilentlyContinue)) {

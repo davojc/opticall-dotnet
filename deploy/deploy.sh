@@ -19,11 +19,13 @@ fi
 
 SERVICE_DIR="/usr/local/bin/$SERVICE_NAME"
 SERVICE_FILE="$SERVICE_DIR/$SERVICE_NAME"
-SERVICE_CONFIG_FILE="$SERVICE_DIR/appsettings.json"
+SERVICE_CONFIG_FILE="$SERVICE_DIR/settings.yml"
+SERVICE_LOGGING_FILE="$SERVICE_DIR/logging.json"
 SERVICE_DESCRIPTION_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 SERVICE_DOWNLOAD_URL="https://github.com/davojc/opticall-dotnet/releases/latest/download"
 SERVICE_BINARY_URL="$SERVICE_DOWNLOAD_URL/$srcFile"
 SERVICE_CONFIG_URL="$SERVICE_DOWNLOAD_URL/settings.yml"
+SERVICE_LOGGING_URL="$SERVICE_DOWNLOAD_URL/logging.json"
 SERVICE_DESCRIPTION_URL="$SERVICE_DOWNLOAD_URL/$SERVICE_NAME.service"
 
 # Function to check if the service exists
@@ -65,6 +67,8 @@ download_service_description_and_settings() {
     sudo curl -L "$SERVICE_CONFIG_URL" -o "$SERVICE_CONFIG_FILE"
     echo "Downloading service description file..."
     sudo curl -L "$SERVICE_DESCRIPTION_URL" -o "$SERVICE_DESCRIPTION_FILE"
+    echo "Downloading service logging file..."
+    sudo curl -L "$SERVICE_LOGGING_URL" -o "$SERVICE_LOGGING_FILE"
 }
 
 update_settings_with_args() {
