@@ -1,71 +1,49 @@
-# Variables
-$serviceName = "Opticall"
-$githubRepo = "https://github.com/davojc/opticall-dotnet/releases/latest/download"
-$downloadExe = "$githubRepo/opticall.exe"
-$downloadConfig = "$githubRepo/appsettings.json"
-$downloadPath = "C:\Program Files\$serviceName"
-$destExe = "$downloadPath\opticall.exe"
-$destConfig = "$downloadPath\appsettings.json"
-$nssmPath = "C:\nssm\nssm.exe"  # Path to NSSM executable
 
-# Check if the service exists
-$service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+# Parameters
+$ServiceName = "Opticall"
+$RepoPath = "https://github.com/davojc/opticall-dotnet/releases/latest/download"
+$FileUrls = @(
+    "$RepoPath/$ServiceName.exe",
+    "$RepoPath/appsettings.json"
+)
+$InstallPath = "C:\Program Files\$ServiceName"
 
-if ($service) {
-    # If the service exists, stop it
-    if ($service.Status -eq 'Running') {
-        Write-Output "Stopping the service '$serviceName'..."
-        Stop-Service -Name $serviceName -Force
-    }
+# Function to download a file
+function Download-File {
+    param (
+        [string]$url,
+        [string]$destinationPath
+    )
+    Write-Output "Downloading file: $url"
+    Invoke-WebRequest -Uri $url -OutFile $destinationPath
 }
 
-# Create the directory if it doesn't exist
-if (-not (Test-Path $downloadPath)) {
-    New-Item -Path $downloadPath -ItemType Directory -Force
+# Stop the service if it exists
+if (Get-Service -Name $ServiceName -ErrorAction SilentlyContinue) {
+    Write-Output "Stopping existing service..."
+    Stop-Service -Name $ServiceName -Force
 }
 
-# Download exe
-try {
-    Write-Output "Download $downloadExe"
-    Invoke-WebRequest -Uri $downloadExe -OutFile $destExe -UseBasicParsing
-    Write-Output "$destExe download completed."
-} catch {
-    Get-Error
-    #Write-Error "Failed to download $destExe: $_"
-    exit 1
+# Ensure the install directory exists
+if (!(Test-Path -Path $InstallPath)) {
+    New-Item -ItemType Directory -Path $InstallPath | Out-Null
 }
 
-# Download app settings
-try {
-    Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $destConfig -UseBasicParsing
-    Write-Output "$destConfig download completed."
-} catch {
-    Get-Error
-    #Write-Error "Failed to download $destConfig: $_"
-    exit 1
+# Download each file to the install path
+foreach ($fileUrl in $FileUrls) {
+    $fileName = Split-Path -Path $fileUrl -Leaf
+    $destinationPath = Join-Path -Path $InstallPath -ChildPath $fileName
+    Download-File -url $fileUrl -destinationPath $destinationPath
 }
 
-# Install the service using NSSM if it doesn't exist
-if (-not $service) {
-    Write-Output "Installing the service '$serviceName' using NSSM..."
-    $nssmInstallCommand = "$nssmPath install $serviceName `"$destExe`""
-    try {
-        Invoke-Expression $nssmInstallCommand
-        Write-Output "Service '$serviceName' installed successfully."
-    } catch {
-        Write-Error "Failed to install the service using NSSM: $_"
-        exit 1
-    }
+# Register the service if it doesn't exist
+if (!(Get-Service -Name $ServiceName -ErrorAction SilentlyContinue)) {
+    Write-Output "Installing service..."
+    New-Service -Name $ServiceName -BinaryPathName "$InstallPath\$ServiceName.exe" -DisplayName "Your Service Display Name" -StartupType Automatic
 }
 
-# Start the service if it was previously stopped or newly installed
-Write-Output "Starting the service '$serviceName'..."
-try {
-    Start-Service -Name $serviceName
-    Write-Output "Service 'Opticall' started successfully."
-} catch {
-    Write-Error "Failed to start the service: $_"
-    exit 1
-}
+# Start the service
+Write-Output "Starting the service..."
+Start-Service -Name $ServiceName
 
-Write-Output "Operation completed."
+Write-Output "Service installation and update process completed."
