@@ -1,3 +1,4 @@
+using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
 using Opticall.Console.OSC;
 
@@ -83,7 +84,12 @@ public class CommandRouter : ICommandRouter
             }
             catch (IndexOutOfRangeException)
             {
-                _logger.LogInformation("Couldn't route message, likelihood is the parameters for the command were incorrect.");
+                _logger.LogInformation(
+                    "Couldn't route message, likelihood is the parameters for the command were incorrect.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Couldn't route message, might be some issue with opening the HID device.");
             }
         }
     }
