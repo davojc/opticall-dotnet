@@ -28,19 +28,37 @@ public class LuxaforDeviceManager : ILuxaforDeviceManager
 
     public void Run(byte[]? command)
     {
-        foreach (var device in _devices)
+        try
         {
-            _logger.LogDebug("Writing command to device.");
-            device.Value.Run(command);
+            foreach (var device in _devices)
+            {
+                _logger.LogDebug("Writing command to device.");
+                device.Value.Run(command);
+            }
+        }
+        catch (FileNotFoundException nfne)
+        {
+            _logger.LogInformation("Failed to call a device. It may be the list is stale so need to refresh the devices.");
+            RefreshDevices();
+            Run(command);
         }
     }
 
     public void RunDirect(byte[] command)
     {
-        foreach (var device in _devices)
+        try
         {
-            _logger.LogDebug("Writing command to device.");
-            device.Value.RunDirect(command);
+            foreach (var device in _devices)
+            {
+                _logger.LogDebug("Writing command to device.");
+                device.Value.RunDirect(command);
+            }
+        }
+        catch (FileNotFoundException nfne)
+        {
+            _logger.LogInformation("Failed to call a device. It may be the list is stale so need to refresh the devices.");
+            RefreshDevices();
+            RunDirect(command);
         }
     }
 
