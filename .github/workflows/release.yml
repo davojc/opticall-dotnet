@@ -122,6 +122,39 @@ jobs:
           asset_name: appsettings.json     # Rename the uploaded file
           asset_content_type: application/json
 
+          # Step 9: Upload the default configuration file to the GitHub Release
+      - name: Upload Configuration File
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./publish/win/appsettings.json               # The path to the published output
+          asset_name: appsettings.json     # Rename the uploaded file
+          asset_content_type: application/json
+
+          # Step 9: Upload the default configuration file to the GitHub Release
+      - name: Upload Target Settings File
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./publish/win/target.setting               # The path to the published output
+          asset_name: target.setting     # Rename the uploaded file
+          asset_content_type: application/json
+
+          # Step 9: Upload the default configuration file to the GitHub Release
+      - name: Upload Group Settings File
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./publish/win/group.setting               # The path to the published output
+          asset_name: group.setting     # Rename the uploaded file
+          asset_content_type: application/json
+
       # Step 10: Upload the default configuration file to the GitHub Release
       - name: Upload Deploy Bash Script
         uses: actions/upload-release-asset@v1

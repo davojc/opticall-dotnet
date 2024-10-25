@@ -1,13 +1,11 @@
 using HidSharp;
 using Microsoft.Extensions.Logging;
-using System.Security.Cryptography;
-using System.Threading;
 
 namespace Opticall.Console.Luxafor;
 
 public interface ILuxaforDeviceManager : ILuxaforDevice
 {
-    void Start();
+    void Initialise();
 }
 
 public class LuxaforDeviceManager : ILuxaforDeviceManager
@@ -23,7 +21,7 @@ public class LuxaforDeviceManager : ILuxaforDeviceManager
         _deviceList.Changed += DeviceListChanged;
     }
 
-    public void Start()
+    public void Initialise()
     {
         RefreshDevices();
     }

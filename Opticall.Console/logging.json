@@ -13,8 +13,5 @@
         "Default": "Information"
       }
     }
-  },
-  "Target": "Default",
-  "Group": "Group",
-  "Port": 8765
+  }
 }

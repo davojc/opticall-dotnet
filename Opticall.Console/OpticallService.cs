@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Opticall.Console.Commands;
+using Opticall.Console.Config;
 using Opticall.Console.Luxafor;
 
 namespace Opticall.Console;
@@ -12,37 +12,28 @@ public class OpticallService : BackgroundService
     private readonly ILuxaforDeviceManager _luxaforDeviceManager;
     private readonly ICommandRouter _commandRouter;
     private readonly ICommandListener _commandListener;
+    private readonly ISettingsProvider _settingsProvider;
 
     public OpticallService(ILogger<OpticallService> logger, 
         ILuxaforDeviceManager luxaforDeviceManager, 
         ICommandRouter commandRouter, 
-        ICommandListener commandListener)
+        ICommandListener commandListener,
+        ISettingsProvider settingsProvider)
     {
         _logger = logger;
         _luxaforDeviceManager = luxaforDeviceManager;
         _commandRouter = commandRouter;
         _commandListener = commandListener;
+        _settingsProvider = settingsProvider;
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var config = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json" ?? "", optional: true)
-            .AddEnvironmentVariables("Opticall_")
-            .Build();
+        _luxaforDeviceManager.Initialise();
+        _settingsProvider.Initialise();
 
-        _luxaforDeviceManager.Start();
-
-        var target = config["Target"];
-        var group = config["Group"];
-        var port = config.GetValue<int>("Port");
-
-        _logger.LogInformation($"Target: {target}");
-        _logger.LogInformation($"Group: {group}");
-        _logger.LogInformation($"Port: {port}");
-
-        _commandRouter.AddIdentifier(target);
-        _commandRouter.AddIdentifier(group);
+        _commandRouter.AddIdentifier(_settingsProvider.Target);
+        _commandRouter.AddIdentifier(_settingsProvider.Group);
         _commandRouter.AddIdentifier("*");
 
         var onCommand = new OnCommand();
@@ -94,10 +85,8 @@ public class OpticallService : BackgroundService
             if (newTarget == null)
                 return;
 
-            _commandRouter.ReplaceIdentifier(target, newTarget);
-
-            Environment.SetEnvironmentVariable("Opticall_Target", newTarget, EnvironmentVariableTarget.User);
-            _logger.LogInformation($"Changed target from '{target}' to {newTarget}");
+            _commandRouter.ReplaceIdentifier(_settingsProvider.Target, newTarget);
+            _settingsProvider.SetTarget(newTarget);
         });
 
         _commandRouter.AddRoute("/config/group", osc =>
@@ -107,15 +96,13 @@ public class OpticallService : BackgroundService
             if (newGroup == null)
                 return;
 
-            _commandRouter.ReplaceIdentifier(group, newGroup);
-
-            Environment.SetEnvironmentVariable("Opticall_Group", newGroup, EnvironmentVariableTarget.User);
-            _logger.LogInformation($"Changed group from '{group}' to {newGroup}");
+            _commandRouter.ReplaceIdentifier(_settingsProvider.Group, newGroup);
+            _settingsProvider.SetTarget(newGroup);
         });
 
         _commandListener.Subscribe(_commandRouter);
 
-        var task = _commandListener.StartListening(port, stoppingToken);
+        var task = _commandListener.StartListening(_settingsProvider.Port, stoppingToken);
         return task;
         /*
         while (!cancellation.IsCancellationRequested)

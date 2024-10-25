@@ -4,19 +4,17 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Opticall.Console;
 using Opticall.Console.Commands;
+using Opticall.Console.Config;
 using Opticall.Console.IO;
 using Opticall.Console.Luxafor;
 
 var hostBuilder = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((context, config) =>
     {
-        config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-        config.AddEnvironmentVariables();
+        config.AddJsonFile("logging.json", optional: true, reloadOnChange: true);
     })
     .ConfigureLogging((context, logging) =>
     {
-        //logging.ClearProviders();
-
         logging.AddConfiguration(context.Configuration.GetSection("Logging"));
 
         logging.SetMinimumLevel(LogLevel.Warning);
@@ -26,6 +24,7 @@ var hostBuilder = Host.CreateDefaultBuilder(args)
         services.AddSingleton<ILuxaforDeviceManager, LuxaforDeviceManager>();
         services.AddSingleton<ICommandRouter, CommandRouter>();
         services.AddSingleton<ICommandListener, OscUdpListener>();
+        services.AddSingleton<ISettingsProvider, SettingsProvider>();
 
         services.AddHostedService<OpticallService>();
     }).UseWindowsService();

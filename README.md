@@ -39,20 +39,20 @@ When opticall is installed, it copies in a default configuration file:
 
 ## Sending OSC commands
 
-Color Commands
+### Color Commands
 
 |Path|Description|Args|
 |-|-|-|
 |/$target/led/on|Turns the LED on with the specified color|$leds $r $g $b|
 |/$target/led/off|Turns the LED off|$leds|
-|/$target/led/strobe|Will set the LED to strobes with a given color at a given speed for a given number of times. Once the strobe is complete it will return to the previous state.|$leds $r $g $b $speed $repeat
+|/$target/led/strobe|Will set the LED to strobes with a given color<br /> at a given speed for a given number of times. <br/>Once the strobe is complete it will return to the previous state.|$leds $r $g $b $speed $repeat
 |/$target/led/pattern|Activates one of the built in patterns|$leds $pattern $repeat| 
 |/$target/led/fade|The LED will fade to the given color over the given time.|$leds $r $g $b %time|
-|/$target/led/wave|Creates a wave along the LED of a given color|
+|/$target/led/wave|Creates a wave along the LED of a given color|$type $r $g $b $speed $repeat
 
 See the following for specific details for each command
 
-### led/on
+#### led/on
 
 |Name|Position|Values|
 |-|-|-|
@@ -61,13 +61,13 @@ See the following for specific details for each command
 |Green|3|0-255|
 |Blue|4|0-255|
 
-### led/off
+#### led/off
 
 |Name|Position|Values|
 |-|-|-|
 |Which LED to effect|1|All - 255, Front - 65, Back - 66, One - 1, Two - 2, Three - 3, Four - 4, Five - 5, Size - 6|
 
-### led/strobe
+#### led/strobe
 
 |Name|Position|Values|
 |-|-|-|
@@ -78,15 +78,14 @@ See the following for specific details for each command
 |Speed|5|0-255|
 |Repeat|6|0-255|
 
-### led/pattern
+#### led/pattern
 
 |Name|Position|Values|
 |-|-|-|
-|Which pattern to apply|1|All - 255, Front - 65, Back - 66, One - 1, Two - 2, Three - 3, Four - 4, Five - 5, Size - 6|
-|Pattern|2|TrafficLight - 1, Random1 -2, Random2 - 3, Random3 - 4, Police = 5, Random4 = 6, Random5 = 7, Random6 = 8 |
-|Time|3|0-255|
+|Pattern|1|TrafficLight - 1, Random1 -2, Random2 - 3, Random3 - 4, Police = 5, Random4 = 6, Random5 = 7, Random6 = 8 |
+|Repeat|2|0-255|
 
-### led/fade
+#### led/fade
 
 |Name|Position|Values|
 |-|-|-|
@@ -96,13 +95,13 @@ See the following for specific details for each command
 |Blue|4|0-255|
 |Time|5|0-255|
 
-### led/wave
+#### led/wave
 
 |Name|Position|Values|
 |-|-|-|
-|Which LED to wave|1|All - 255, Front - 65, Back - 66, One - 1, Two - 2, Three - 3, Four - 4, Five - 5, Size - 6|
+|Wave Function|1|Short - 1, Long - 2, Overlapping Short - 3, Overlapping Long - 4, Other - 5|
 |Red|2|0-255|
 |Green|3|0-255|
 |Blue|4|0-255|
-|Repeat|5|0-255|
-|Speed|6|0-255|
+|Speed|5|0-255|
+|Repeat|6|0-255|

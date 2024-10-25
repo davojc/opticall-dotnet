@@ -1,0 +1,3 @@
+﻿target: default
+group: group
+port: 8765

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# If passed, set environment variables
+envTarget=""
+envGroup=""
+
 # Variables
 SERVICE_NAME="opticall"
 
@@ -19,7 +23,7 @@ SERVICE_CONFIG_FILE="$SERVICE_DIR/appsettings.json"
 SERVICE_DESCRIPTION_FILE="/etc/systemd/system/$SERVICE_NAME.service"
 SERVICE_DOWNLOAD_URL="https://github.com/davojc/opticall-dotnet/releases/latest/download"
 SERVICE_BINARY_URL="$SERVICE_DOWNLOAD_URL/$srcFile"
-SERVICE_CONFIG_URL="$SERVICE_DOWNLOAD_URL/appsettings.json"
+SERVICE_CONFIG_URL="$SERVICE_DOWNLOAD_URL/settings.yml"
 SERVICE_DESCRIPTION_URL="$SERVICE_DOWNLOAD_URL/$SERVICE_NAME.service"
 
 # Function to check if the service exists
@@ -63,6 +67,27 @@ download_service_description_and_settings() {
     sudo curl -L "$SERVICE_DESCRIPTION_URL" -o "$SERVICE_DESCRIPTION_FILE"
 }
 
+update_settings_with_args() {
+    while getopts "tg" opt; do
+    case $opt in
+        t)
+            envTarget="$OPTARG"
+            ;;
+        g)
+            envGroup="$OPTARG"
+            ;;
+        esac
+    done
+
+    if [ "$envTarget" -neq "" ]; then
+        sed -i 's|target: .*|target: $envTarget|' $SERVICE_CONFIG_URL
+    fi
+
+    if [ "$envGroup" -neq "" ]; then
+        sed -i 's|group: .*|group: $envGroup|' $SERVICE_CONFIG_URL
+    fi
+}
+
 # Function to enable and start the service
 install_and_start_service() {
     echo "Reloading systemd..."
@@ -88,12 +113,14 @@ if check_service_exists; then
     echo "$SERVICE_NAME is already installed."
     stop_service
     download_service_file
+    update_settings_with_args
     start_service
 else
     echo "$SERVICE_NAME is not installed. Proceeding with installation..."
     create_directory
     download_service_file
     download_service_description_and_settings
+    update_settings_with_args
     install_and_start_service
 fi
 

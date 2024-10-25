@@ -1,15 +1,18 @@
+using YamlDotNet.Serialization;
+
 namespace Opticall.Console.Config
 {
-    public sealed class Settings 
+    public sealed class Settings
     {
-        public SignalSettings? Signal { get; set; }
-        public NetworkSettings? Network { get; set; }
-    }
+        [YamlMember(Alias = "target")] 
+        public string Target { get; set; } = "Target";
 
-    public sealed class SignalSettings
-    {
-        public required string? Target { get; set; }
 
-        public required string? Group { get; set; }
+        [YamlMember(Alias = "group")] 
+        public string Group { get; set; } = "Group";
+
+
+        [YamlMember(Alias = "port")] 
+        public int Port { get; set; } = 8765;
     }
 }

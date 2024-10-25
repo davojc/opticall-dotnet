@@ -1,10 +1,19 @@
+# Setting env variables if provided
+param (
+    [Parameter(Mandatory=$false)]
+    [string]$Target,
+
+    [Parameter(Mandatory=$false)]
+    [string]$Group
+)
 
 # Parameters
 $ServiceName = "Opticall"
 $RepoPath = "https://github.com/davojc/opticall-dotnet/releases/latest/download"
 $FileUrls = @(
     "$RepoPath/$ServiceName.exe",
-    "$RepoPath/appsettings.json"
+    "$RepoPath/settings.yml",
+    "$RepoPath/logging.json"
 )
 $InstallPath = "C:\Program Files\$ServiceName"
 
@@ -35,6 +44,20 @@ foreach ($fileUrl in $FileUrls) {
     $destinationPath = Join-Path -Path $InstallPath -ChildPath $fileName
     Download-File -url $fileUrl -destinationPath $destinationPath
 }
+
+$yamlFilePath = "$destinationPath\settings.yml"
+$yamlData = Get-Content -Path $yamlFilePath -Raw
+
+if ($Target) {
+    $yamlContent = $yamlContent -replace '(target:\s*)(\d+)', '${1}$Target'
+}
+
+if ($Group) {
+    $yamlContent = $yamlContent -replace '(group:\s*)(\d+)', '${1}$Group'
+}
+
+# Convert back to YAML format and write it to the file
+$yamlData | ConvertTo-Yaml | Set-Content -Path $yamlFilePath
 
 # Register the service if it doesn't exist
 if (!(Get-Service -Name $ServiceName -ErrorAction SilentlyContinue)) {
