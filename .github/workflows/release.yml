@@ -111,17 +111,6 @@ jobs:
           asset_name: opticall-arm-32     # Rename the uploaded file
           asset_content_type: application/octet-stream
 
-      # Step 9: Upload the default configuration file to the GitHub Release
-      - name: Upload Configuration File
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./publish/win/appsettings.json               # The path to the published output
-          asset_name: appsettings.json     # Rename the uploaded file
-          asset_content_type: application/json
-
           # Step 9: Upload the default configuration file to the GitHub Release
       - name: Upload Configuration File
         uses: actions/upload-release-asset@v1
