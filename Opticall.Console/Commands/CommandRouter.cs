@@ -1,13 +1,18 @@
-using HidSharp.Reports.Input;
-using Microsoft.VisualBasic.CompilerServices;
+using Microsoft.Extensions.Logging;
 using Opticall.Console.OSC;
 
 namespace Opticall.Console.Commands;
 
 public class CommandRouter : ICommandRouter
 {
+    private readonly ILogger<CommandRouter> _logger;
     private readonly HashSet<string> _identifiers = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
     private readonly IDictionary<string, RouteSpec> _routes = new Dictionary<string, RouteSpec>(StringComparer.InvariantCultureIgnoreCase);
+
+    public CommandRouter(ILogger<CommandRouter> logger)
+    {
+        _logger = logger;
+    }
 
     private class RouteSpec(string address, Action<OscMessage> onRoute)
     {
@@ -46,6 +51,7 @@ public class CommandRouter : ICommandRouter
 
     public void OnError(Exception error)
     {
+        _logger.LogError(error, "CommandRouter received error.");
     }
 
     public void OnNext(OscMessage message)
@@ -77,6 +83,7 @@ public class CommandRouter : ICommandRouter
             }
             catch (IndexOutOfRangeException)
             {
+                _logger.LogInformation("Couldn't route message, likelihood is the parameters for the command were incorrect.");
             }
         }
     }

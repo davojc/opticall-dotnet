@@ -1,16 +1,19 @@
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using HidSharp;
+using Microsoft.Extensions.Logging;
 
 namespace Opticall.Console.Luxafor;
 
 public class LuxaforDevice : ILuxaforDevice
 {
     private readonly HidDevice _hidDevice;
+    private readonly ILogger _logger;
 
-    public LuxaforDevice(HidDevice hidDevice) 
+    public LuxaforDevice(HidDevice hidDevice, ILogger logger)
     {
         _hidDevice = hidDevice;
+        _logger = logger;
     }
 
     public string DeviceId => _hidDevice.DevicePath;
@@ -30,7 +33,6 @@ public class LuxaforDevice : ILuxaforDevice
 
         using(var stream = _hidDevice.Open())
         {
-            System.Console.WriteLine("Writing to device");
             stream.Write(command, 0, command.Length);
         }
     }
@@ -45,13 +47,12 @@ public class LuxaforDevice : ILuxaforDevice
 
         if(_hidDevice.TryOpen(out DeviceStream deviceStream))
         {
-            System.Console.WriteLine("Writing to device");
             deviceStream.Write(command, 0, command.Length);
             deviceStream.Close();
         }
         else 
         {
-            System.Console.WriteLine("Couldn't open stream;");
+            _logger.LogWarning("Couldn't open device stream.");
         }
     }
 }

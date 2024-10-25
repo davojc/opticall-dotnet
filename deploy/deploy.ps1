@@ -39,7 +39,7 @@ foreach ($fileUrl in $FileUrls) {
 # Register the service if it doesn't exist
 if (!(Get-Service -Name $ServiceName -ErrorAction SilentlyContinue)) {
     Write-Output "Installing service..."
-    New-Service -Name $ServiceName -BinaryPathName "$InstallPath\$ServiceName.exe" -DisplayName "Your Service Display Name" -StartupType Automatic
+    New-Service -Name $ServiceName -BinaryPathName "$InstallPath\$ServiceName.exe" -DisplayName "$ServiceName" -StartupType Automatic
 }
 
 # Start the service

@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Reactive.Subjects;
+using Microsoft.Extensions.Logging;
 using Opticall.Console.Commands;
 using Opticall.Console.OSC;
 using Opticall.Console.OSC.IO;
@@ -9,23 +10,17 @@ namespace Opticall.Console.IO;
 
 public class OscUdpListener : ICommandListener
 {
-    readonly UdpClient _client;
+    private readonly ILogger<OscUdpListener> _logger;
     readonly Subject<OscMessage> _subject;
-    readonly CancellationToken _cancelTokenSrc;
+    UdpClient _client;
+    CancellationToken _cancellation;
 
     private bool _disposed;
 
-    public OscUdpListener(int port, CancellationToken cancellation)
+    public OscUdpListener(ILogger<OscUdpListener> logger)
     {
+        _logger = logger;
         _subject = new Subject<OscMessage>();
-
-        var udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-        var ipEndpoint = new IPEndPoint(IPAddress.Any, port);
-        udpSocket.Bind(ipEndpoint);
-
-        _client = new UdpClient() { Client = udpSocket };
-        _cancelTokenSrc = cancellation;
     }
 
     ~OscUdpListener() // the finalizer
@@ -33,26 +28,34 @@ public class OscUdpListener : ICommandListener
         Dispose(false);
     }
 
-    public async Task StartListening()
+    public async Task StartListening(int port, CancellationToken cancellation)
     {
+        _logger.LogInformation($"Starting listening on port: {port}");
+        var udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        udpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+        var ipEndpoint = new IPEndPoint(IPAddress.Any, port);
+        udpSocket.Bind(ipEndpoint);
+        _cancellation = cancellation;
+
+        _client = new UdpClient() { Client = udpSocket };
+
         try
         {
-            while (!_cancelTokenSrc.IsCancellationRequested)
+            while (!_cancellation.IsCancellationRequested)
             {
-                var message = await _client.ReceiveMessageAsync(_cancelTokenSrc);
+                var message = await _client.ReceiveMessageAsync(_cancellation);
                 _subject.OnNext(message);
             }
         }
         catch (OperationCanceledException)
         {
             // Cancellation requested, do nothing
-            System.Console.WriteLine("Finished");
+            _logger.LogInformation("Shutting down listener.");
             _subject.OnCompleted();
         }
         catch (SocketException ex)
         {
             _subject.OnError(ex);
-            System.Console.WriteLine($"SocketException: {ex.Message}");
         }
         catch(Exception e)
         {

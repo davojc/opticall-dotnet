@@ -1,17 +1,30 @@
 using HidSharp;
+using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
 using System.Threading;
 
 namespace Opticall.Console.Luxafor;
 
-public class LuxaforDeviceManager : ILuxaforDevice
+public interface ILuxaforDeviceManager : ILuxaforDevice
 {
+    void Start();
+}
+
+public class LuxaforDeviceManager : ILuxaforDeviceManager
+{
+    private readonly ILogger<LuxaforDeviceManager> _logger;
     private readonly IDictionary<string, LuxaforDevice> _devices = new Dictionary<string, LuxaforDevice>();
     private readonly DeviceList _deviceList;
 
-    public LuxaforDeviceManager()
+    public LuxaforDeviceManager(ILogger<LuxaforDeviceManager> logger)
     {
+        _logger = logger;
         _deviceList = DeviceList.Local;
         _deviceList.Changed += DeviceListChanged;
+    }
+
+    public void Start()
+    {
         RefreshDevices();
     }
 
@@ -19,6 +32,7 @@ public class LuxaforDeviceManager : ILuxaforDevice
     {
         foreach (var device in _devices)
         {
+            _logger.LogDebug("Writing command to device.");
             device.Value.Run(command);
         }
     }
@@ -27,12 +41,14 @@ public class LuxaforDeviceManager : ILuxaforDevice
     {
         foreach (var device in _devices)
         {
+            _logger.LogDebug("Writing command to device.");
             device.Value.RunDirect(command);
         }
     }
 
     private void DeviceListChanged(object? sender, DeviceListChangedEventArgs e)
     {
+        Thread.Sleep(TimeSpan.FromSeconds(5));
         RefreshDevices();
     }
 
@@ -56,13 +72,13 @@ public class LuxaforDeviceManager : ILuxaforDevice
 
             if (_devices.ContainsKey(hid.DevicePath)) continue;
 
-            System.Console.WriteLine("Adding device.");
-            var luxaforDevice = new LuxaforDevice(hid);
+            var luxaforDevice = new LuxaforDevice(hid, _logger);
             _devices.Add(hid.DevicePath, luxaforDevice);
+            _logger.LogInformation("Adding Luxafor device.");
+            _logger.LogDebug($"Device path: {hid.DevicePath}");
             found.Add(hid.DevicePath);
 
-           // Thread.Sleep(5);
-            //luxaforDevice.RunDirect(new byte[] { 0, (byte)CommandType.Pattern, 1, 5 });
+            luxaforDevice.RunDirect(new byte[] { 0, (byte)CommandType.Pattern, 1, 5 });
         }
 
         var notFound = new HashSet<string>();
@@ -77,7 +93,8 @@ public class LuxaforDeviceManager : ILuxaforDevice
 
         foreach (var remove in notFound)
         {
-            System.Console.WriteLine("Removing device.");
+            _logger.LogInformation("Removing Luxafor device.");
+            _logger.LogDebug($"Device path: {remove}");
             _devices.Remove(remove);
         }
     }

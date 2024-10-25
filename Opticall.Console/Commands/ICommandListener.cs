@@ -4,5 +4,5 @@ namespace Opticall.Console.Commands;
 
 public interface ICommandListener : IDisposable, IObservable<OscMessage>
 {
-    Task StartListening();
+    Task StartListening(int port, CancellationToken cancellation);
 }

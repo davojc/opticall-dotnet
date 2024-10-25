@@ -1,108 +1,121 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Opticall.Console.Commands;
-using Opticall.Console.IO;
 using Opticall.Console.Luxafor;
 
 namespace Opticall.Console;
 
 public class OpticallService : BackgroundService
 {
+    private readonly ILogger<OpticallService> _logger;
+    private readonly ILuxaforDeviceManager _luxaforDeviceManager;
+    private readonly ICommandRouter _commandRouter;
+    private readonly ICommandListener _commandListener;
+
+    public OpticallService(ILogger<OpticallService> logger, 
+        ILuxaforDeviceManager luxaforDeviceManager, 
+        ICommandRouter commandRouter, 
+        ICommandListener commandListener)
+    {
+        _logger = logger;
+        _luxaforDeviceManager = luxaforDeviceManager;
+        _commandRouter = commandRouter;
+        _commandListener = commandListener;
+    }
+
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var config = new ConfigurationBuilder()
-        .AddJsonFile("appsettings.json" ?? "", optional: true)
-        .AddEnvironmentVariables()
-        .Build();
+            .AddJsonFile("appsettings.json" ?? "", optional: true)
+            .AddEnvironmentVariables("Opticall_")
+            .Build();
 
-        var luxafor = new LuxaforDeviceManager();
-
-        var router = new CommandRouter();
+        _luxaforDeviceManager.Start();
 
         var target = config["Target"];
         var group = config["Group"];
         var port = config.GetValue<int>("Port");
 
-        System.Console.WriteLine($"Target: {target}");
-        System.Console.WriteLine($"Group: {group}");
-        System.Console.WriteLine($"Port: {port}");
+        _logger.LogInformation($"Target: {target}");
+        _logger.LogInformation($"Group: {group}");
+        _logger.LogInformation($"Port: {port}");
 
-        router.AddIdentifier(target);
-        router.AddIdentifier(group);
-        router.AddIdentifier("*");
+        _commandRouter.AddIdentifier(target);
+        _commandRouter.AddIdentifier(group);
+        _commandRouter.AddIdentifier("*");
 
         var onCommand = new OnCommand();
-        router.AddRoute("/led/on", osc =>
+        _commandRouter.AddRoute("/led/on", osc =>
         {
             var cmd = onCommand.CreateCommand(osc);
-            luxafor.Run(cmd);
+            _luxaforDeviceManager.Run(cmd);
         });
 
         var offCommand = new OffCommand();
-        router.AddRoute("/led/off", osc =>
+        _commandRouter.AddRoute("/led/off", osc =>
         {
             var cmd = offCommand.CreateCommand(osc);
-            luxafor.Run(cmd);
+            _luxaforDeviceManager.Run(cmd);
         });
 
         var patternCommand = new PatternCommand();
-        router.AddRoute("/led/pattern", osc =>
+        _commandRouter.AddRoute("/led/pattern", osc =>
         {
             var cmd = patternCommand.CreateCommand(osc);
-            luxafor.RunDirect(cmd);
+            _luxaforDeviceManager.RunDirect(cmd);
         });
 
         var strobeCommand = new StrobeCommand();
-        router.AddRoute("/led/strobe", osc =>
+        _commandRouter.AddRoute("/led/strobe", osc =>
         {
             var cmd = strobeCommand.CreateCommand(osc);
-            luxafor.Run(cmd);
+            _luxaforDeviceManager.Run(cmd);
         });
 
         var waveCommand = new WaveCommand();
-        router.AddRoute("/led/wave", osc =>
+        _commandRouter.AddRoute("/led/wave", osc =>
         {
             var cmd = waveCommand.CreateCommand(osc);
-            luxafor.Run(cmd);
+            _luxaforDeviceManager.Run(cmd);
         });
 
         var fadeCommand = new FadeCommand();
-        router.AddRoute("/led/fade", osc =>
+        _commandRouter.AddRoute("/led/fade", osc =>
         {
             var cmd = fadeCommand.CreateCommand(osc);
-            luxafor.Run(cmd);
+            _luxaforDeviceManager.Run(cmd);
         });
 
-        router.AddRoute("/config/target", osc =>
+        _commandRouter.AddRoute("/config/target", osc =>
         {
             var newTarget = osc.ReadFirstArgAsString();
 
             if (newTarget == null)
                 return;
 
-            router.ReplaceIdentifier(target, newTarget);
+            _commandRouter.ReplaceIdentifier(target, newTarget);
 
-            Environment.SetEnvironmentVariable("Target", newTarget);
+            Environment.SetEnvironmentVariable("Opticall_Target", newTarget, EnvironmentVariableTarget.User);
+            _logger.LogInformation($"Changed target from '{target}' to {newTarget}");
         });
 
-        router.AddRoute("/config/group", osc =>
+        _commandRouter.AddRoute("/config/group", osc =>
         {
             var newGroup = osc.ReadFirstArgAsString();
 
             if (newGroup == null)
                 return;
 
-            router.ReplaceIdentifier(group, newGroup);
+            _commandRouter.ReplaceIdentifier(group, newGroup);
 
-            Environment.SetEnvironmentVariable("Group", newGroup);
+            Environment.SetEnvironmentVariable("Opticall_Group", newGroup, EnvironmentVariableTarget.User);
+            _logger.LogInformation($"Changed group from '{group}' to {newGroup}");
         });
 
+        _commandListener.Subscribe(_commandRouter);
 
-
-        var receiver = new OscUdpListener(port, stoppingToken);
-        receiver.Subscribe(router);
-
-        var task = receiver.StartListening();
+        var task = _commandListener.StartListening(port, stoppingToken);
         return task;
         /*
         while (!cancellation.IsCancellationRequested)
