@@ -4,6 +4,17 @@
 envTarget=""
 envGroup=""
 
+while getopts "t:g:" opt; do
+case $opt in
+    t)
+        envTarget="$OPTARG"
+        ;;
+    g)
+        envGroup="$OPTARG"
+        ;;
+    esac
+done
+
 # Variables
 SERVICE_NAME="opticall"
 
@@ -72,23 +83,14 @@ download_service_description_and_settings() {
 }
 
 update_settings_with_args() {
-    while getopts "tg" opt; do
-    case $opt in
-        t)
-            envTarget="$OPTARG"
-            ;;
-        g)
-            envGroup="$OPTARG"
-            ;;
-        esac
-    done
-
-    if [ "$envTarget" -neq "" ]; then
-        sed -i 's|target: .*|target: $envTarget|' $SERVICE_CONFIG_URL
+    if [ "$envTarget" != "" ]; then
+        echo "Updating target"
+        sed -i "s|target: .*|target: $envTarget|" $SERVICE_CONFIG_FILE
     fi
 
-    if [ "$envGroup" -neq "" ]; then
-        sed -i 's|group: .*|group: $envGroup|' $SERVICE_CONFIG_URL
+    if [ "$envGroup" != "" ]; then
+        echo "Updating group"
+        sed -i "s|group: .*|group: $envGroup|" $SERVICE_CONFIG_FILE
     fi
 }
 
