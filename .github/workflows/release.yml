@@ -154,3 +154,14 @@ jobs:
           asset_path: ./deploy/opticall.service               # The path to the published output
           asset_name: opticall.service     # Rename the uploaded file
           asset_content_type: text/plain
+
+      # Step 10: Upload the default configuration file to the GitHub Release
+      - name: Upload Deploy Powershell Script
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./deploy/deploy.ps1               # The path to the published output
+          asset_name: deploy.ps1     # Rename the uploaded file
+          asset_content_type: text/x-powershell
