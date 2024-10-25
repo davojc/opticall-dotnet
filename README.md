@@ -1,41 +1,97 @@
 # opticall-dotnet
 
+## Service Config
+
+The optical service has only 3 config settings:
+
+|Settings|Description|Default|
+|-|-|-|
+|target|This is the id of the target. Using this means that you can broadcast messages but only the target signal will react.|target|
+|group|This is a group which can be used so that when you broadcast only members of the group will respond|group|
+|port|This is the port to listen on.|8765|
+
+To see the different options for configuring these settings.
+
+### Config file
+
+When installed, the service will be set up with a config file 'settings.yml' in the same directory as the 
+
+```
+settings.yml
+```
+
+This file contains the above 3 settings so can be modified to the desired settings.
+
+### On deployment
+
+When installing you will have the option to specify the target and/or group for the service. See installing for details on the arguments you can pass to the deployment scripts.
+
+### Via OSC command
+
+The config setting 'target' and 'group' can be modified by sending an OSC command. Be aware that if you make changes this way that it will stop responding to the old 'target' or 'group'. This change is also persisted, it will write the change to the configuration file.
+
+|Path|Args|
+|-|-|
+|/$target/config/target|New target|
+|/$target/config/group|New group|
 
 ## Install on Linux
 
 ### Dependencies
 
-```
-sudo
-```
+- sudo
+- curl
 
-```
-curl
-```
+### Steps
 
-Download and run the bash script found at: https://github.com/davojc/opticall-dotnet/releases/latest/download/deploy.sh
+- Download the deployment bash script
+```bash
+wget -O deploy.sh https://github.com/davojc/opticall-dotnet/releases/latest/download/deploy.sh
+```
+- Run the bash script (see below for args)
 
-### Verify installed
+|Arg|
+|-|
+|-t customTarget|
+|-g customGroup|
+
+### Verify install
+
+The service binaries and config will be installed in the location: '/usr/local/bin/opticall'.
 
 ```
 systemtcl status opticall.service
 ```
 
+## Install on Windows
 
+### Steps
 
-## Configuring the endpoint
+- Open a powershell console as administrator.
 
-Each endpoint is configured with a Target Id and a Group Id. This will allow sending messages to specific device (Target) or a group of devices (Group) if broadcast is used.
-
-When opticall is installed, it copies in a default configuration file:
-
-```json
-{
-    "Target": "Default",
-    "Group": "Group",
-    "Port": 8765
-}
+- Set the execution policy
 ```
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
+```
+
+- Download the deployment script using the following:
+```
+Invoke-WebRequest https://github.com/davojc/opticall-dotnet/releases/latest/download/deploy.ps1 -OutFile deploy.ps1
+```
+- Run the powershell script (see below for args)
+
+|Arg|
+|-|
+|-t customTarget|
+|-g customGroup|
+
+### Verify Install
+
+The service binaries and config will be installed in the location: "C:\Program Files\Opticall"
+
+You should find a Windows Service in the Services console called 'Opticall'.
+
+
 
 ## Sending OSC commands
 
