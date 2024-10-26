@@ -5,14 +5,15 @@ namespace Opticall.Console.Commands;
 public class WaveCommand() : Command(CommandType.Wave)
 {
     protected override int Length => 8;
-
-    protected override IEnumerable<ArgumentMap> GetMaps()
+    protected override byte[] Map(byte[] command, object[] args)
     {
-        yield return new ArgumentMap(0, 1);
-        yield return new ArgumentMap(1, 2);
-        yield return new ArgumentMap(2, 3);
-        yield return new ArgumentMap(3, 4);
-        yield return new ArgumentMap(4, 7);
-        yield return new ArgumentMap(5, 6);
+        command[1] = (byte)args[0];
+        command[2] = (byte)args[1];
+        command[3] = (byte)args[2];
+        command[4] = (byte)args[3];
+        command[7] = (byte)args[4];
+        command[6] = (byte)args[5];
+
+        return command;
     }
 }
