@@ -5,8 +5,6 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Opticall.Console", "Opticall.Console\Opticall.Console.csproj", "{2E37AFA1-AB10-4A07-A515-EFFC442CD04B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Opticall_Tests", "Opticall_Tests\Opticall_Tests.csproj", "{DFDC9007-1720-4A54-9AFF-389E8309DA5A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,14 +15,6 @@ Global
 		{2E37AFA1-AB10-4A07-A515-EFFC442CD04B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E37AFA1-AB10-4A07-A515-EFFC442CD04B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E37AFA1-AB10-4A07-A515-EFFC442CD04B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DFDC9007-1720-4A54-9AFF-389E8309DA5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DFDC9007-1720-4A54-9AFF-389E8309DA5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DFDC9007-1720-4A54-9AFF-389E8309DA5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DFDC9007-1720-4A54-9AFF-389E8309DA5A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3EE3C959-715B-469C-8088-8087243A7863}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3EE3C959-715B-469C-8088-8087243A7863}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3EE3C959-715B-469C-8088-8087243A7863}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3EE3C959-715B-469C-8088-8087243A7863}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

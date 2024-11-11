@@ -2,11 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Opticall.Console;
 using Opticall.Console.Commands;
 using Opticall.Console.Config;
 using Opticall.Console.IO;
 using Opticall.Console.Luxafor;
+using Opticall.Console.Services;
 
 var hostBuilder = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((context, config) =>
@@ -19,6 +19,7 @@ var hostBuilder = Host.CreateDefaultBuilder(args)
 
         logging.SetMinimumLevel(LogLevel.Warning);
     })
+
     .ConfigureServices((hostContext, services) =>
     {
         services.AddSingleton<ILuxaforDeviceManager, LuxaforDeviceManager>();
@@ -27,6 +28,7 @@ var hostBuilder = Host.CreateDefaultBuilder(args)
         services.AddSingleton<ISettingsProvider, SettingsProvider>();
 
         services.AddHostedService<OpticallService>();
+        services.AddHostedService<OpticallApiService>();
     }).UseWindowsService();
 
 hostBuilder.Build().Run();

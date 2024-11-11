@@ -8,8 +8,6 @@ public interface ISettingsProvider
 
     int Port { get; }
 
-    void Initialise();
-
     void SetTarget(string target);
 
     void SetGroup(string group);

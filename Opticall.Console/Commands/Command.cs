@@ -28,5 +28,19 @@ public abstract class Command(CommandType commandType)
         return command;
     }
 
+    public byte[] CreateCommand(byte[] message)
+    {
+        var command = Enumerable.Repeat((byte)0, Length).ToArray();
+
+        command[CommandPosition] = (byte)commandType;
+
+        foreach (var map in GetMaps())
+        {
+            command[map.To] = Convert.ToByte(message[map.From]);
+        }
+
+        return command;
+    }
+
     protected abstract IEnumerable<ArgumentMap> GetMaps();
 }

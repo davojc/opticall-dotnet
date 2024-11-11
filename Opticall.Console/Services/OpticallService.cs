@@ -4,7 +4,7 @@ using Opticall.Console.Commands;
 using Opticall.Console.Config;
 using Opticall.Console.Luxafor;
 
-namespace Opticall.Console;
+namespace Opticall.Console.Services;
 
 public class OpticallService : BackgroundService
 {
@@ -14,9 +14,9 @@ public class OpticallService : BackgroundService
     private readonly ICommandListener _commandListener;
     private readonly ISettingsProvider _settingsProvider;
 
-    public OpticallService(ILogger<OpticallService> logger, 
-        ILuxaforDeviceManager luxaforDeviceManager, 
-        ICommandRouter commandRouter, 
+    public OpticallService(ILogger<OpticallService> logger,
+        ILuxaforDeviceManager luxaforDeviceManager,
+        ICommandRouter commandRouter,
         ICommandListener commandListener,
         ISettingsProvider settingsProvider)
     {
@@ -30,7 +30,6 @@ public class OpticallService : BackgroundService
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _luxaforDeviceManager.Initialise();
-        _settingsProvider.Initialise();
 
         _commandRouter.AddIdentifier(_settingsProvider.Target);
         _commandRouter.AddIdentifier(_settingsProvider.Group);
@@ -104,31 +103,5 @@ public class OpticallService : BackgroundService
 
         var task = _commandListener.StartListening(_settingsProvider.Port, stoppingToken);
         return task;
-        /*
-        while (!cancellation.IsCancellationRequested)
-        {
-            var command = System.Console.ReadLine();
-
-            if (command == null)
-                continue;
-
-            var parts = command.Split(' ');
-
-            var address = new Address(parts[0]);
-            var objectArgs = new List<object>();
-
-            foreach (var arg in parts.Skip(1))
-            {
-                var intArg = Convert.ToInt32(arg);
-                objectArgs.Add(intArg);
-            }
-
-            var msg = new OscMessage(address, objectArgs);
-
-            router.OnNext(msg);
-        }
-        */
-
-        // Wait for the listening task to complete
     }
 }

@@ -32,10 +32,7 @@ public class SettingsProvider : ISettingsProvider
         _serializer = new SerializerBuilder()
             .WithNamingConvention(UnderscoredNamingConvention.Instance)
             .Build();
-    }
 
-    public void Initialise()
-    {
         using (var reader = new StreamReader(_yamlSettingsFile))
             _settings = _deserializer.Deserialize<Settings>(reader);
 
