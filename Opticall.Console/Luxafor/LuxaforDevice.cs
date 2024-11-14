@@ -1,58 +1,39 @@
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using HidSharp;
 using Microsoft.Extensions.Logging;
+using Opticall.Console.Command;
 
 namespace Opticall.Console.Luxafor;
 
-public class LuxaforDevice : ILuxaforDevice
+public class LuxaforDevice(HidDevice hidDevice, ILogger logger) : ILuxaforDevice
 {
-    private readonly HidDevice _hidDevice;
-    private readonly ILogger _logger;
+    public string DeviceId => hidDevice.DevicePath;
 
-    public LuxaforDevice(HidDevice hidDevice, ILogger logger)
-    {
-        _hidDevice = hidDevice;
-        _logger = logger;
-    }
-
-    public string DeviceId => _hidDevice.DevicePath;
-
-    public void Run(byte[]? command)
+    public void Run(ICommand command)
     {
         if(command == null)
             return;
+
+        var cmd = command.ToBytes().ToArray();
 
         // For some reason array needs to be shifted by 1 for windows.
+        /*
         if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            Array.Resize(ref command, command.Length + 1);
-            Array.Copy(command, 0, command, 1, command.Length -1 );
-            command[0] = 0;
+            Array.Resize(ref cmd, cmd.Length + 1);
+            Array.Copy(cmd, 0, cmd, 1, cmd.Length -1 );
+            cmd[0] = 0;
         }
+        */
 
-        using(var stream = _hidDevice.Open())
+        if (hidDevice.TryOpen(out DeviceStream deviceStream))
         {
-            stream.Write(command, 0, command.Length);
-        }
-    }
-
-    public void RunDirect(byte[] command)
-    {
-        if(command == null)
-            return;
-
-        var writeData = Array.ConvertAll(command, x => x);
-
-
-        if(_hidDevice.TryOpen(out DeviceStream deviceStream))
-        {
-            deviceStream.Write(command, 0, command.Length);
+            deviceStream.Write(cmd, 0, cmd.Length);
             deviceStream.Close();
         }
-        else 
+        else
         {
-            _logger.LogWarning("Couldn't open device stream.");
+            logger.LogWarning("Couldn't open device stream.");
         }
     }
 }

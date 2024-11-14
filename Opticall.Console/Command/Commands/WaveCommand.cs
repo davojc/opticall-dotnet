@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using Opticall.Console.Luxafor;
 
-namespace Opticall.Console.Requests;
+namespace Opticall.Console.Command.Commands;
 
-public record WaveRequest : IRequest
+public class WaveCommand : ICommand
 {
     [JsonPropertyName("wave")]
     public WaveType Wave { get; set; }
@@ -17,18 +17,18 @@ public record WaveRequest : IRequest
     [JsonPropertyName("repeat")]
     public byte Repeat { get; set; } = 10;
 
-    public byte[] ToBytes()
+    public IEnumerable<byte> ToBytes()
     {
-        var input = Enumerable.Repeat((byte)0, 6).ToArray();
         var rgb = ColorConverter.HexToRgb(Color);
 
-        input[0] = (byte)Wave;
-        input[1] = (byte)rgb.r;
-        input[2] = (byte)rgb.g;
-        input[3] = (byte)rgb.b;
-        input[4] = (byte)Speed;
-        input[5] = (byte)Repeat;
-
-        return input;
+        yield return 0;
+        yield return (byte)CommandType.Wave;
+        yield return (byte)Wave;
+        yield return rgb.r;
+        yield return rgb.g;
+        yield return rgb.b;
+        yield return Repeat;
+        yield return Speed;
+        yield return 0;
     }
 }

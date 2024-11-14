@@ -1,12 +1,9 @@
 using HidSharp;
 using Microsoft.Extensions.Logging;
+using Opticall.Console.Command;
+using Opticall.Console.Command.Commands;
 
 namespace Opticall.Console.Luxafor;
-
-public interface ILuxaforDeviceManager : ILuxaforDevice
-{
-    void Initialise();
-}
 
 public class LuxaforDeviceManager : ILuxaforDeviceManager
 {
@@ -26,7 +23,7 @@ public class LuxaforDeviceManager : ILuxaforDeviceManager
         RefreshDevices();
     }
 
-    public void Run(byte[]? command)
+    public void Run(ICommand command)
     {
         try
         {
@@ -41,24 +38,6 @@ public class LuxaforDeviceManager : ILuxaforDeviceManager
             _logger.LogInformation("Failed to call a device. It may be the list is stale so need to refresh the devices.");
             RefreshDevices();
             Run(command);
-        }
-    }
-
-    public void RunDirect(byte[] command)
-    {
-        try
-        {
-            foreach (var device in _devices)
-            {
-                _logger.LogDebug("Writing command to device.");
-                device.Value.RunDirect(command);
-            }
-        }
-        catch (FileNotFoundException nfne)
-        {
-            _logger.LogInformation("Failed to call a device. It may be the list is stale so need to refresh the devices.");
-            RefreshDevices();
-            RunDirect(command);
         }
     }
 
@@ -94,7 +73,13 @@ public class LuxaforDeviceManager : ILuxaforDeviceManager
             _logger.LogDebug($"Device path: {hid.DevicePath}");
             found.Add(hid.DevicePath);
 
-            luxaforDevice.RunDirect(new byte[] { 0, (byte)CommandType.Pattern, 1, 5 });
+            var pattern = new PatternCommand
+            {
+                Pattern = PatternType.Rainbow,
+                Repeat = 2
+            };
+
+            luxaforDevice.Run(pattern);
         }
 
         var notFound = new HashSet<string>();

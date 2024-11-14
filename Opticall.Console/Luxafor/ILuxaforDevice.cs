@@ -1,8 +1,8 @@
+using Opticall.Console.Command;
+
 namespace Opticall.Console.Luxafor;
 
 public interface ILuxaforDevice
 {   
-    void Run(byte[]? command);
-
-    void RunDirect(byte[] command);
+    void Run(ICommand command);
 }

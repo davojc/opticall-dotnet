@@ -1,6 +1,6 @@
 using Opticall.Console.OSC;
 
-namespace Opticall.Console.Commands;
+namespace Opticall.Console.Command;
 
 public interface ICommandRouter : IObserver<OscMessage>
 {

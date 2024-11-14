@@ -1,8 +1,7 @@
-using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
 using Opticall.Console.OSC;
 
-namespace Opticall.Console.Commands;
+namespace Opticall.Console.Command;
 
 public class CommandRouter : ICommandRouter
 {

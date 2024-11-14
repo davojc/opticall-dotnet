@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
-using Opticall.Console.Commands;
+using Opticall.Console.Command;
 using Opticall.Console.OSC;
 using Opticall.Console.OSC.IO;
 
