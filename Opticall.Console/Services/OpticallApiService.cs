@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Opticall.Console.Commands;
 using Opticall.Console.Config;
 using Opticall.Console.Luxafor;
-using Opticall.Console.Model;
+using Opticall.Console.Requests;
 
 namespace Opticall.Console.Services;
 
@@ -21,6 +22,10 @@ public class OpticallApiService : BackgroundService
     {
         var onCommand = new OnCommand();
         var offCommand = new OffCommand();
+        var patternCommand = new PatternCommand();
+        var waveCommand = new WaveCommand();
+        var fadeCommand = new FadeCommand();
+        var strobeCommand = new StrobeCommand();
 
         _settingsProvider = settingsProvider;
         _webHost = Host.CreateDefaultBuilder()
@@ -28,6 +33,7 @@ public class OpticallApiService : BackgroundService
             {
                 webBuilder.Configure(app =>
                 {
+                    app.UseMiddleware<ErrorHandlingMiddleware>();
                     app.UseRouting();
 
                     app.UseEndpoints(endpoints =>
@@ -57,7 +63,6 @@ public class OpticallApiService : BackgroundService
 
                         });
 
-
                         var leds = Enum.GetValues(typeof(Led));
 
                         foreach (var led in leds.Cast<Led>())
@@ -68,25 +73,65 @@ public class OpticallApiService : BackgroundService
                             {
                                 var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
 
-                                var on = JsonSerializer.Deserialize<On>(requestBody);
-                                var onBytes = on.ToBytes(led);
-                                var cmd = onCommand.CreateCommand(onBytes);
+                                var on = JsonSerializer.Deserialize<OnRequest>(requestBody);
+                                var onBytes = on.ToBytes();
+                                var cmd = onCommand.CreateCommand(led, onBytes);
                                 luxaforDeviceManager.Run(cmd);
                             });
-                        }
-
-                        foreach (var led in leds.Cast<Led>())
-                        {
-                            var ledName = Enum.GetName(typeof(Led), led).ToLowerInvariant();
 
                             endpoints.MapPost($"/led/{ledName}/off/", async context =>
                             {
-                                var off = new Off();
-                                var offBytes = off.ToBytes(led);
-                                var cmd = offCommand.CreateCommand(offBytes);
+                                var off = new OffRequest();
+                                var offBytes = off.ToBytes();
+                                var cmd = offCommand.CreateCommand(led, offBytes);
+                                luxaforDeviceManager.Run(cmd);
+                            });
+
+                            endpoints.MapPost($"/led/{ledName}/strobe/", async context =>
+                            {
+                                var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+
+                                var strobe = JsonSerializer.Deserialize<StrobeRequest>(requestBody);
+                                var strobeBytes = strobe.ToBytes();
+                                var cmd = strobeCommand.CreateCommand(led, strobeBytes);
+                                luxaforDeviceManager.Run(cmd);
+                            });
+
+                            endpoints.MapPost($"/led/{ledName}/fade/", async context =>
+                            {
+                                var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+
+                                var fade = JsonSerializer.Deserialize<FadeRequest>(requestBody);
+                                var fadeBytes = fade.ToBytes();
+                                var cmd = fadeCommand.CreateCommand(led, fadeBytes);
                                 luxaforDeviceManager.Run(cmd);
                             });
                         }
+
+                        var options = new JsonSerializerOptions
+                        {
+                            Converters = { new JsonStringEnumConverter() }
+                        };
+
+                        endpoints.MapPost($"/led/pattern/", async context =>
+                        {
+                            var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+
+                            var pattern = JsonSerializer.Deserialize<PatternRequest>(requestBody, options);
+                            var patternBytes = pattern.ToBytes();
+                            var cmd = patternCommand.CreateCommand(patternBytes);
+                            luxaforDeviceManager.RunDirect(cmd);
+                        });
+
+                        endpoints.MapPost($"/led/wave/", async context =>
+                        {
+                            var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+
+                            var wave = JsonSerializer.Deserialize<WaveRequest>(requestBody, options);
+                            var waveBytes = wave.ToBytes();
+                            var cmd = waveCommand.CreateCommand(waveBytes);
+                            luxaforDeviceManager.RunDirect(cmd);
+                        });
                     });
                 });
 

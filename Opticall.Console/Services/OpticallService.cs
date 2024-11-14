@@ -6,6 +6,32 @@ using Opticall.Console.Luxafor;
 
 namespace Opticall.Console.Services;
 
+public class LedRouteBuilder(ICommandRouter commandRouter, LedCommand command, ILuxaforDeviceManager deviceManager)
+{
+    public LedRouteBuilder AddRoute(string path, Led led)
+    {
+        commandRouter.AddRoute(path, osc =>
+        {
+            var cmd = command.CreateCommand(led, osc);
+            deviceManager.Run(cmd);
+        });
+
+        return this;
+    }
+}
+
+public static class RouteExtensions
+{
+    public static void AddLedRoute(this ICommandRouter commandRouter, string path, Led led, LedCommand command, ILuxaforDeviceManager luxaforDeviceManager)
+    {
+        commandRouter.AddRoute(path, osc =>
+        {
+            var cmd = command.CreateCommand(led, osc);
+            luxaforDeviceManager.Run(cmd);
+        });
+    }
+}
+
 public class OpticallService : BackgroundService
 {
     private readonly ILogger<OpticallService> _logger;
@@ -35,19 +61,27 @@ public class OpticallService : BackgroundService
         _commandRouter.AddIdentifier(_settingsProvider.Group);
         _commandRouter.AddIdentifier("*");
 
-        var onCommand = new OnCommand();
-        _commandRouter.AddRoute("/led/on", osc =>
-        {
-            var cmd = onCommand.CreateCommand(osc);
-            _luxaforDeviceManager.Run(cmd);
-        });
+        new LedRouteBuilder(_commandRouter, new OnCommand(), _luxaforDeviceManager)
+            .AddRoute("/led/all/on", Led.All)
+            .AddRoute("/led/front/on", Led.Front)
+            .AddRoute("/led/back/on", Led.Back)
+            .AddRoute("/led/1/on", Led.One)
+            .AddRoute("/led/2/on", Led.Two)
+            .AddRoute("/led/3/on", Led.Three)
+            .AddRoute("/led/4/on", Led.Four)
+            .AddRoute("/led/5/on", Led.Five)
+            .AddRoute("/led/6/on", Led.Six);
 
-        var offCommand = new OffCommand();
-        _commandRouter.AddRoute("/led/off", osc =>
-        {
-            var cmd = offCommand.CreateCommand(osc);
-            _luxaforDeviceManager.Run(cmd);
-        });
+        new LedRouteBuilder(_commandRouter, new OffCommand(), _luxaforDeviceManager)
+            .AddRoute("/led/all/off", Led.All)
+            .AddRoute("/led/front/off", Led.Front)
+            .AddRoute("/led/back/off", Led.Back)
+            .AddRoute("/led/1/off", Led.One)
+            .AddRoute("/led/2/off", Led.Two)
+            .AddRoute("/led/3/off", Led.Three)
+            .AddRoute("/led/4/off", Led.Four)
+            .AddRoute("/led/5/off", Led.Five)
+            .AddRoute("/led/6/off", Led.Six);
 
         var patternCommand = new PatternCommand();
         _commandRouter.AddRoute("/led/pattern", osc =>
@@ -56,12 +90,27 @@ public class OpticallService : BackgroundService
             _luxaforDeviceManager.RunDirect(cmd);
         });
 
-        var strobeCommand = new StrobeCommand();
-        _commandRouter.AddRoute("/led/strobe", osc =>
-        {
-            var cmd = strobeCommand.CreateCommand(osc);
-            _luxaforDeviceManager.Run(cmd);
-        });
+        new LedRouteBuilder(_commandRouter, new StrobeCommand(), _luxaforDeviceManager)
+            .AddRoute("/led/all/strobe", Led.All)
+            .AddRoute("/led/front/strobe", Led.Front)
+            .AddRoute("/led/back/strobe", Led.Back)
+            .AddRoute("/led/1/strobe", Led.One)
+            .AddRoute("/led/2/strobe", Led.Two)
+            .AddRoute("/led/3/strobe", Led.Three)
+            .AddRoute("/led/4/strobe", Led.Four)
+            .AddRoute("/led/5/strobe", Led.Five)
+            .AddRoute("/led/6/strobe", Led.Six);
+
+        new LedRouteBuilder(_commandRouter, new FadeCommand(), _luxaforDeviceManager)
+            .AddRoute("/led/all/fade", Led.All)
+            .AddRoute("/led/front/fade", Led.Front)
+            .AddRoute("/led/back/fade", Led.Back)
+            .AddRoute("/led/1/fade", Led.One)
+            .AddRoute("/led/2/fade", Led.Two)
+            .AddRoute("/led/3/fade", Led.Three)
+            .AddRoute("/led/4/fade", Led.Four)
+            .AddRoute("/led/5/fade", Led.Five)
+            .AddRoute("/led/6/fade", Led.Six);
 
         var waveCommand = new WaveCommand();
         _commandRouter.AddRoute("/led/wave", osc =>
@@ -70,11 +119,9 @@ public class OpticallService : BackgroundService
             _luxaforDeviceManager.Run(cmd);
         });
 
-        var fadeCommand = new FadeCommand();
-        _commandRouter.AddRoute("/led/fade", osc =>
+        _commandRouter.AddRoute("/led/reload", osc =>
         {
-            var cmd = fadeCommand.CreateCommand(osc);
-            _luxaforDeviceManager.Run(cmd);
+            _luxaforDeviceManager.Initialise();
         });
 
         _commandRouter.AddRoute("/config/target", osc =>

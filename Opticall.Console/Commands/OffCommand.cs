@@ -1,13 +1,12 @@
 using Opticall.Console.Luxafor;
+using Opticall.Console.OSC;
 
 namespace Opticall.Console.Commands;
 
-public class OffCommand() : Command(CommandType.Color)
+public class OffCommand() : LedCommand(CommandType.Color)
 {
-    protected override int Length => 8;
-
-    protected override IEnumerable<ArgumentMap> GetMaps()
+    protected override byte[] Map(byte[] command, object[] args)
     {
-        yield return new ArgumentMap(0, 1);
+        return command;
     }
 }

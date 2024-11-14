@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Opticall.Console;
 using Opticall.Console.Commands;
 using Opticall.Console.Config;
 using Opticall.Console.IO;
@@ -19,7 +20,6 @@ var hostBuilder = Host.CreateDefaultBuilder(args)
 
         logging.SetMinimumLevel(LogLevel.Warning);
     })
-
     .ConfigureServices((hostContext, services) =>
     {
         services.AddSingleton<ILuxaforDeviceManager, LuxaforDeviceManager>();

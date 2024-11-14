@@ -1,4 +1,5 @@
 using Opticall.Console.Luxafor;
+using Opticall.Console.OSC;
 
 namespace Opticall.Console.Commands;
 
@@ -7,10 +8,11 @@ public class PatternCommand() : Command(CommandType.Pattern)
     protected override int Length => 4;
 
     protected override int CommandPosition => 1;
-
-    protected override IEnumerable<ArgumentMap> GetMaps()
+    protected override byte[] Map(byte[] command, object[] args)
     {
-        yield return new ArgumentMap(0, 2);
-        yield return new ArgumentMap(1, 3);
+        command[2] = Convert.ToByte(args[0]);
+        command[3] = Convert.ToByte(args[1]);
+
+        return command;
     }
 }
